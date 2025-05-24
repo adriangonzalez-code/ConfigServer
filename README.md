@@ -49,6 +49,7 @@ through an intuitive user interface and provides secure access through APIs.
 - Client API stores retrieved properties in its environment object
 - Sensitive properties are automatically decrypted before delivery
 - Supports property refresh without application restart
+- Maintains detailed change history for all property modifications
 
 4. **High Availability & Performance**
 
@@ -61,10 +62,12 @@ through an intuitive user interface and provides secure access through APIs.
 ## Main Features
 
 - ✨ Centralized configuration management
-- 🔐 Secure secrets handling
+- 🔐 Secure secrets handling with encryption
 - 🔄 Dynamic properties update
 - 📊 Complete audit system
 - 🎯 Scope management for different environments/applications
+- 📝 Detailed change history for properties
+- 🕒 Property versioning and rollback capabilities
 - 🚀 REST API for service integration
 - 👥 Authentication and authorization system
 - 📱 Modern and responsive user interface
@@ -107,7 +110,7 @@ through an intuitive user interface and provides secure access through APIs.
   ```
   - scopes
   - properties
-  - secrets
+  - property_change_logs
   - audit_logs
   - users
   - roles
@@ -164,6 +167,8 @@ config-server:
 * PUT    /api/v1/properties/{propertyId}
 * DELETE /api/v1/properties/{propertyId}
 * GET    /api/v1/audit-logs
+* GET    /api/v1/properties/{propertyId}/changes
+* GET    /api/v1/properties/{propertyId}/changes/{changeId}/rollback
 
 ## Monitoring and Logs
 
@@ -173,6 +178,8 @@ config-server:
 - Resource usage
 - Access statistics
 - Audit logs
+- Property change history
+- Configuration change frequency
 
 ### Monitoring Systems Integration
 
