@@ -17,7 +17,7 @@ services.
 
 ## Prerequisites 📋
 
-- Java 17 or higher (OpenJDK recommended)
+- Java 21 or higher (OpenJDK recommended)
 - Maven 3.8+ (for building and dependency management)
 - Docker Desktop (for containerization and running required services)
 - Git (for version control and configuration management)
