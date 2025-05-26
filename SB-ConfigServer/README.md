@@ -48,7 +48,7 @@ used for PostgreSQL:
 2. Start PostgreSQL container using Docker:
 
 ```bash
-  docker run --name postgres -e POSTGRES_USER=postgres -e POSTGRES_PASSWORD=admin123 -d -p 5432:5432 postgres
+  docker run -e POSTGRES_USER=postgres -e POSTGRES_PASSWORD=admin123 -d -p 5432:5432 postgres
 ```
 
 ### 4. Build and Run the Application

@@ -6,9 +6,7 @@ import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
-import jakarta.persistence.JoinColumn;
-import jakarta.persistence.JoinTable;
-import jakarta.persistence.ManyToMany;
+import jakarta.persistence.OneToOne;
 import jakarta.persistence.Table;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -22,8 +20,6 @@ import org.hibernate.annotations.UpdateTimestamp;
 import java.io.Serial;
 import java.io.Serializable;
 import java.time.LocalDateTime;
-import java.util.HashSet;
-import java.util.Set;
 
 @Getter
 @Setter
@@ -43,28 +39,23 @@ public class User implements Serializable {
     @Column(name = "ID")
     private Long id;
 
-    @Column(name = "USERNAME", length = 50, nullable = false, unique = true)
-    private String username;
-
-    @Column(name = "PASSWORD", nullable = false)
-    private String password;
-
     @Column(name = "EMAIL", length = 100, nullable = false, unique = true)
     private String email;
 
-    @Column(name = "FULL_NAME", length = 100, nullable = false)
-    private String fullName;
+    @Column(name = "firstName", length = 100, nullable = false)
+    private String firstName;
+
+    @Column(name = "lastName", length = 100, nullable = false)
+    private String lastName;
 
     @Column(name = "ACTIVE", nullable = false)
     private boolean active = true;
 
-    @ManyToMany(fetch = FetchType.EAGER)
-    @JoinTable(
-            name = "user_roles",
-            joinColumns = @JoinColumn(name = "USER_ID"),
-            inverseJoinColumns = @JoinColumn(name = "ROLE_ID")
-    )
-    private Set<Role> roles = new HashSet<>();
+    @Column(name = "PASSWORD", nullable = false)
+    private String password;
+
+    @OneToOne(fetch = FetchType.LAZY)
+    private Role role;
 
     @Column(name = "CREATED_AT", nullable = false, updatable = false)
     @CreationTimestamp
