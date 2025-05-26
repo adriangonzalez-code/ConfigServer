@@ -5,9 +5,13 @@ import com.driagon.services.configserver.dto.responses.UserResponse;
 import com.driagon.services.configserver.mappers.UserMapper;
 import com.driagon.services.configserver.repositories.IUserRepository;
 import com.driagon.services.configserver.services.IUserService;
+import com.driagon.services.error.exceptions.BusinessException;
+import com.driagon.services.logging.annotations.ExceptionLog;
+import com.driagon.services.logging.annotations.Loggable;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.jasypt.encryption.StringEncryptor;
+import org.slf4j.event.Level;
 import org.springframework.dao.DataAccessException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -54,12 +58,25 @@ public class UserServiceImpl implements IUserService {
      */
     @Override
     @Transactional
+    @Loggable(
+            level = Level.INFO,
+            exceptions = {
+                    @ExceptionLog(
+                            value = BusinessException.class,
+                            message = "The email provided is already in use."
+                    ),
+                    @ExceptionLog(
+                            value = DataAccessException.class,
+                            message = "An exception occurred while accessing the database.",
+                            printStackTrace = true
+                    )
+            },
+            exceptionLevel = Level.ERROR
+    )
     public UserResponse createUser(UserRequest userRequest) {
-        log.info("Creating user with email {}", userRequest.getEmail());
         this.repository.findByEmail(userRequest.getEmail())
                 .ifPresent(user -> {
-                    log.error("User with email {} already exists.", userRequest.getEmail());
-                    throw new IllegalArgumentException("User with email " + userRequest.getEmail() + " already exists.");
+                    throw new BusinessException("This email is already in use.");
                 });
 
         // User does not exist, proceed with creation
@@ -72,7 +89,6 @@ public class UserServiceImpl implements IUserService {
             log.info("User created successfully with ID {}", user.getId());
             return this.mapper.mapEntityToResponse(user);
         } catch (DataAccessException e) {
-            log.error("Error creating user with email {}: {}", userRequest.getEmail(), e.getMessage());
             throw new RuntimeException(e);
         }
     }
