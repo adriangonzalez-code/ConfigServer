@@ -19,10 +19,10 @@ public interface IUserService {
     /**
      * Retrieves a user by their Email.
      *
-     * @param email the email of the user to retrieve
+     * @param id the ID of the user to retrieve
      * @return the user with the specified email
      */
-    UserResponse getUserByEmail(String email);
+    UserResponse getUserById(Long id);
 
     /**
      * Creates a new user with the provided details.
@@ -35,16 +35,24 @@ public interface IUserService {
     /**
      * Updates an existing user with the provided details.
      *
-     * @param email the email of the user to update
+     * @param id the ID of the user to update
      * @param request the details to update the user with
      * @return the updated user
      */
-    UserResponse updateUser(String email, UpdateUserRequest request);
+    UserResponse updateUser(Long id, UpdateUserRequest request);
 
     /**
      * Deletes a user by their ID.
      *
      * @param userId the ID of the user to delete
      */
-    boolean deleteUser(Long userId);
+    void deleteUser(Long userId);
+
+    /**
+     * Updates the password of a user.
+     *
+     * @param userId the ID of the user whose password is to be updated
+     * @param newPassword the new password to set for the user
+     */
+    void updateUserPassword(Long userId, String newPassword);
 }

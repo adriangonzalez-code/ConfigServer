@@ -6,6 +6,8 @@ import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.ManyToOne;
 import jakarta.persistence.OneToOne;
 import jakarta.persistence.Table;
 import lombok.AllArgsConstructor;
@@ -25,7 +27,7 @@ import java.time.LocalDateTime;
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
-@ToString(exclude = "password")
+@ToString
 @Builder
 @Entity
 @Table(name = "users")
@@ -42,10 +44,10 @@ public class User implements Serializable {
     @Column(name = "EMAIL", length = 100, nullable = false, unique = true)
     private String email;
 
-    @Column(name = "firstName", length = 100, nullable = false)
+    @Column(name = "FIRST_NAME", length = 100, nullable = false)
     private String firstName;
 
-    @Column(name = "lastName", length = 100, nullable = false)
+    @Column(name = "LAST_NAME", length = 100, nullable = false)
     private String lastName;
 
     @Column(name = "ACTIVE", nullable = false)
@@ -54,7 +56,8 @@ public class User implements Serializable {
     @Column(name = "PASSWORD", nullable = false)
     private String password;
 
-    @OneToOne(fetch = FetchType.LAZY)
+    @ManyToOne(optional = false, fetch = FetchType.EAGER)
+    @JoinColumn(name = "ROLE_ID", nullable = false, referencedColumnName = "ID")
     private Role role;
 
     @Column(name = "CREATED_AT", nullable = false, updatable = false)

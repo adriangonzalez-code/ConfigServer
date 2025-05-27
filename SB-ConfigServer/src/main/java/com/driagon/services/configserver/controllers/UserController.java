@@ -8,6 +8,7 @@ import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -33,10 +34,10 @@ public class UserController {
         return ResponseEntity.ok(users);
     }
 
-    @GetMapping("/{email}")
-    public ResponseEntity<UserResponse> getUserByEmail(@PathVariable String email) {
-        log.info("Retrieving user with email {}", email);
-        UserResponse user = this.service.getUserByEmail(email);
+    @GetMapping("/{id}")
+    public ResponseEntity<UserResponse> getUserById(@PathVariable Long id) {
+        log.info("Retrieving user with id {}", id);
+        UserResponse user = this.service.getUserById(id);
         return ResponseEntity.ok(user);
     }
 
@@ -47,10 +48,17 @@ public class UserController {
         return ResponseEntity.ok(createdUser);
     }
 
-    @PutMapping("/{email}")
-    public ResponseEntity<UserResponse> updateUser(@PathVariable String email, @Valid @RequestBody UpdateUserRequest request) {
-        log.info("Updating user with email {}", email);
-        UserResponse updatedUser = this.service.updateUser(email, request);
+    @PutMapping("/{id}")
+    public ResponseEntity<UserResponse> updateUser(@PathVariable Long id, @Valid @RequestBody UpdateUserRequest request) {
+        log.info("Updating user with id {}", id);
+        UserResponse updatedUser = this.service.updateUser(id, request);
         return ResponseEntity.ok(updatedUser);
+    }
+
+    @DeleteMapping("/{id}")
+    public ResponseEntity<Void> deleteUser(@PathVariable Long id) {
+        log.info("Deleting user with email {}", id);
+        this.service.deleteUser(id);
+        return ResponseEntity.noContent().build();
     }
 }

@@ -23,6 +23,7 @@ public interface UserMapper {
     User mapUserRequestToUserEntity(UserRequest request);
 
     @Mappings({
+        @Mapping(target = "id", source = "id"),
         @Mapping(target = "firstName", source = "firstName"),
         @Mapping(target = "lastName", source = "lastName"),
         @Mapping(target = "email", source = "email"),
@@ -31,6 +32,7 @@ public interface UserMapper {
     UserResponse mapUserEntityToUserResponse(User user);
 
     @Mappings({
+        @Mapping(target = "id", source = "id"),
         @Mapping(target = "firstName", source = "firstName"),
         @Mapping(target = "lastName", source = "lastName"),
         @Mapping(target = "email", source = "email"),

@@ -1,7 +1,7 @@
 ```toml
 name = 'Update User By Email'
 method = 'PUT'
-url = 'http://localhost:8080/api/users/email@mail.com'
+url = 'http://localhost:8080/api/users/1'
 sortWeight = 4000000
 id = '223c5814-f49a-4eb2-9c28-2ecec33c5d20'
 
@@ -9,9 +9,11 @@ id = '223c5814-f49a-4eb2-9c28-2ecec33c5d20'
 type = 'JSON'
 raw = '''
 {
-  "firstName": "John",
+  "id": 1,
+  "firstName": "Jane",
   "lastName": "Doe",
-  "email": "email@mail.com",
+  "email": "jane@mail.com",
+  "active": true,
   "roleId": 2,
 }'''
 ```

@@ -23,6 +23,8 @@ public class UpdateUserRequest implements Serializable {
     @Serial
     private static final long serialVersionUID = -2576025351115485544L;
 
+    private Long id;
+
     @NotBlank
     private String firstName;
 

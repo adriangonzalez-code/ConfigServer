@@ -68,7 +68,7 @@ public class UserServiceImpl implements IUserService {
     }
 
     @Override
-    @Loggable(message = "Retrieving user by Email", level = Level.INFO, exceptionLevel = Level.ERROR, exceptions = {
+    @Loggable(message = "Retrieving user by Id", level = Level.INFO, exceptionLevel = Level.ERROR, exceptions = {
             @ExceptionLog(
                     value = NotFoundException.class,
                     message = "User with ID {0} not found."
@@ -80,9 +80,9 @@ public class UserServiceImpl implements IUserService {
             )
     })
     @Transactional(readOnly = true)
-    public UserResponse getUserByEmail(String email) {
-        var user = this.repository.findByEmail(email)
-                .orElseThrow(() -> new NotFoundException("User with email " + email + " not found."));
+    public UserResponse getUserById(Long id) {
+        var user = this.repository.findById(id)
+                .orElseThrow(() -> new NotFoundException("User with ID " + id + " not found."));
         return this.mapper.mapUserEntityToUserResponse(user);
     }
 
@@ -93,7 +93,7 @@ public class UserServiceImpl implements IUserService {
                     message = "The email provided is already in use."
             ),
             @ExceptionLog(
-                    value = ProcessException.class,
+                    value = DataAccessException.class,
                     message = "An exception occurred while accessing the database.",
                     printStackTrace = true
             )
@@ -105,10 +105,15 @@ public class UserServiceImpl implements IUserService {
                     throw new BusinessException("This email is already in use.");
                 });
 
+        // Validate role existence
+        var role = this.roleRepository.findById(userRequest.getRoleId())
+                .orElseThrow(() -> new NotFoundException("Role with ID " + userRequest.getRoleId() + " not found."));
+
         // User does not exist, proceed with creation
         var user = this.mapper.mapUserRequestToUserEntity(userRequest);
         log.info("Encrypting password for user {}", user.getEmail());
         user.setPassword(this.encryptor.encrypt(user.getPassword()));
+        user.setRole(role);
 
         try {
             user = this.repository.save(user);
@@ -120,10 +125,10 @@ public class UserServiceImpl implements IUserService {
     }
 
     @Override
-    @Loggable(message = "Updating user with email {0}", level = Level.INFO, exceptionLevel = Level.ERROR, exceptions = {
+    @Loggable(message = "Updating user with id {0}", level = Level.INFO, exceptionLevel = Level.ERROR, exceptions = {
             @ExceptionLog(
                     value = NotFoundException.class,
-                    message = "User with email {0} not found."
+                    message = "User with id {0} not found."
             ),
             @ExceptionLog(
                     value = ProcessException.class,
@@ -132,26 +137,75 @@ public class UserServiceImpl implements IUserService {
             )
     })
     @Transactional
-    public UserResponse updateUser(String email, UpdateUserRequest request) {
+    public UserResponse updateUser(Long id, UpdateUserRequest request) {
         try {
-            var user = this.repository.findByEmail(email)
-                    .orElseThrow(() -> new NotFoundException("User with email " + email + " not found."));
+            var user = this.repository.findById(id)
+                    .orElseThrow(() -> new NotFoundException("User with ID " + id + " not found."));
+
+            this.repository.findByEmail(request.getEmail())
+                    .filter(existingUser -> !existingUser.getId().equals(id))
+                    .ifPresent(existingUser -> {
+                        throw new BusinessException("Este email ya está en uso por otro usuario.");
+                    });
 
             var role = this.roleRepository.findById(request.getRoleId())
-                    .orElseThrow(() -> new NotFoundException("Role with ID " + request.getRoleId() + " not found."));
+                    .orElseThrow(() -> new NotFoundException("Rol con ID " + request.getRoleId() + " no encontrado."));
 
             this.mapper.mapUpdateUserRequestToUserEntity(request, user);
             user.setRole(role);
-
             user = this.repository.save(user);
             return this.mapper.mapUserEntityToUserResponse(user);
+        } catch (DataAccessException e) {
+            throw new ProcessException("Ocurrió un error al acceder a la base de datos.");
+        }
+    }
+
+    @Override
+    @Loggable(message = "Deleting user with ID {0}", level = Level.INFO, exceptionLevel = Level.ERROR, exceptions = {
+            @ExceptionLog(
+                    value = NotFoundException.class,
+                    message = "User with ID {0} not found."
+            ),
+            @ExceptionLog(
+                    value = ProcessException.class,
+                    message = "An error occurred while accessing the database.",
+                    printStackTrace = true
+            )
+    })
+    @Transactional
+    public void deleteUser(Long userId) {
+        try {
+            var user = this.repository.findById(userId)
+                    .orElseThrow(() -> new NotFoundException("User with ID " + userId + " not found."));
+
+            this.repository.delete(user);
         } catch (DataAccessException e) {
             throw new ProcessException("An error occurred while accessing the database.");
         }
     }
 
     @Override
-    public boolean deleteUser(Long userId) {
-        return false;
+    @Loggable(message = "Updating password for user with ID {0}", level = Level.INFO, exceptionLevel = Level.ERROR, exceptions = {
+            @ExceptionLog(
+                    value = NotFoundException.class,
+                    message = "User with ID {0} not found."
+            ),
+            @ExceptionLog(
+                    value = ProcessException.class,
+                    message = "An error occurred while accessing the database.",
+                    printStackTrace = true
+            )
+    })
+    public void updateUserPassword(Long userId, String newPassword) {
+        try {
+            var user = this.repository.findById(userId)
+                    .orElseThrow(() -> new NotFoundException("User with ID " + userId + " not found."));
+
+            log.info("Encrypting new password for user {}", user.getEmail());
+            user.setPassword(this.encryptor.encrypt(newPassword));
+            this.repository.save(user);
+        } catch (DataAccessException e) {
+            throw new ProcessException("An error occurred while accessing the database.");
+        }
     }
 }
