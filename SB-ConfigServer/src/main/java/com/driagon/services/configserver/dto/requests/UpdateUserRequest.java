@@ -1,5 +1,7 @@
-package com.driagon.services.configserver.dto.responses;
+package com.driagon.services.configserver.dto.requests;
 
+import com.driagon.services.logging.annotations.Mask;
+import jakarta.validation.constraints.NotBlank;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
@@ -16,13 +18,21 @@ import java.io.Serializable;
 @AllArgsConstructor
 @ToString
 @Builder
-public class UserResponse implements Serializable {
+public class UpdateUserRequest implements Serializable {
 
     @Serial
-    private static final long serialVersionUID = -2992287748743930093L;
+    private static final long serialVersionUID = -2576025351115485544L;
 
+    @NotBlank
     private String firstName;
+
     private String lastName;
+
+    private boolean active;
+
+    @NotBlank
+    @Mask
     private String email;
-    private String roleName;
+
+    private Long roleId;
 }
