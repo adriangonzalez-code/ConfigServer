@@ -53,5 +53,4 @@ public class Role implements Serializable {
     @Column(name = "UPDATED_AT")
     @UpdateTimestamp
     private LocalDateTime updatedAt;
-
 }

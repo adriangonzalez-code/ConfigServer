@@ -1,5 +1,6 @@
 package com.driagon.services.configserver.services;
 
+import com.driagon.services.configserver.dto.requests.UpdateUserRequest;
 import com.driagon.services.configserver.dto.requests.UserRequest;
 import com.driagon.services.configserver.dto.responses.UserResponse;
 
@@ -14,13 +15,14 @@ public interface IUserService {
      */
     Set<UserResponse> getAllUsers();
 
+
     /**
-     * Retrieves a user by their ID.
+     * Retrieves a user by their Email.
      *
-     * @param userId the ID of the user to retrieve
-     * @return the user with the specified ID, or null if not found
+     * @param id the ID of the user to retrieve
+     * @return the user with the specified email
      */
-    UserResponse getUserById(Long userId);
+    UserResponse getUserById(Long id);
 
     /**
      * Creates a new user with the provided details.
@@ -33,16 +35,24 @@ public interface IUserService {
     /**
      * Updates an existing user with the provided details.
      *
-     * @param userId      the ID of the user to update
-     * @param userRequest the new details for the user
+     * @param id the ID of the user to update
+     * @param request the details to update the user with
      * @return the updated user
      */
-    UserResponse updateUser(Long userId, UserRequest userRequest);
+    UserResponse updateUser(Long id, UpdateUserRequest request);
 
     /**
      * Deletes a user by their ID.
      *
      * @param userId the ID of the user to delete
      */
-    boolean deleteUser(Long userId);
+    void deleteUser(Long userId);
+
+    /**
+     * Updates the password of a user.
+     *
+     * @param userId the ID of the user whose password is to be updated
+     * @param newPassword the new password to set for the user
+     */
+    void updateUserPassword(Long userId, String newPassword);
 }
