@@ -61,4 +61,11 @@ public class UserController {
         this.service.deleteUser(id);
         return ResponseEntity.noContent().build();
     }
+
+    @PutMapping("/{id}/password")
+    public ResponseEntity<Void> updateUserPassword(@PathVariable Long id, @RequestBody String newPassword) {
+        log.info("Updating password for user with id {}", id);
+        this.service.updateUserPassword(id, newPassword);
+        return ResponseEntity.noContent().build();
+    }
 }
