@@ -13,6 +13,6 @@ raw = '''
   "lastName": "Hinostroza",
   "email": "pepe@mail.com",
   "password": "password123",
-  "roleId": 2,
+  "roleId": 1,
 }'''
 ```

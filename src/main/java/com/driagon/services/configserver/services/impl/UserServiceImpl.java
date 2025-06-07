@@ -12,7 +12,10 @@ import com.driagon.services.error.exceptions.NotFoundException;
 import com.driagon.services.error.exceptions.ProcessException;
 import com.driagon.services.logging.annotations.ExceptionLog;
 import com.driagon.services.logging.annotations.Loggable;
+import com.driagon.services.logging.annotations.Mask;
 import com.driagon.services.logging.constants.Level;
+import com.driagon.services.logging.utils.MaskedLogger;
+import com.driagon.services.logging.utils.MaskingUtils;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.jasypt.encryption.StringEncryptor;
@@ -25,7 +28,6 @@ import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
-@Slf4j
 public class UserServiceImpl implements IUserService {
 
     private final IUserRepository repository;
@@ -36,16 +38,20 @@ public class UserServiceImpl implements IUserService {
 
     private final StringEncryptor encryptor;
 
+    private final MaskedLogger log = MaskedLogger.getLogger(this.getClass());
+
     @Override
-    @Loggable(message = "Retrieving all users", level = Level.INFO, exceptionLevel = Level.ERROR, exceptions = {
+    @Loggable(message = "Retrieving all users", level = Level.INFO, unexpectedExceptionLevel = Level.ERROR, exceptions = {
             @ExceptionLog(
                     value = NotFoundException.class,
-                    message = "No users found in the system."
+                    message = "No users found in the system.",
+                    exceptionLevel = Level.WARN
             ),
             @ExceptionLog(
                     value = ProcessException.class,
                     message = "An error occurred while accessing the database.",
-                    printStackTrace = true
+                    printStackTrace = true,
+                    exceptionLevel = Level.WARN
             )
     })
     @Transactional(readOnly = true)
@@ -68,7 +74,7 @@ public class UserServiceImpl implements IUserService {
     }
 
     @Override
-    @Loggable(message = "Retrieving user by Id", level = Level.INFO, exceptionLevel = Level.ERROR, exceptions = {
+    @Loggable(message = "Retrieving user by Id", level = Level.INFO, unexpectedExceptionLevel = Level.ERROR, exceptions = {
             @ExceptionLog(
                     value = NotFoundException.class,
                     message = "User with ID {0} not found."
@@ -80,14 +86,15 @@ public class UserServiceImpl implements IUserService {
             )
     })
     @Transactional(readOnly = true)
-    public UserResponse getUserById(Long id) {
+    public UserResponse getUserById(@Mask Long id) {
+        log.info("Retrieving user with ID {}", id);
         var user = this.repository.findById(id)
                 .orElseThrow(() -> new NotFoundException("User with ID " + id + " not found."));
         return this.mapper.mapUserEntityToUserResponse(user);
     }
 
     @Override
-    @Loggable(message = "Creating user", level = Level.INFO, exceptionLevel = Level.ERROR, exceptions = {
+    @Loggable(message = "Creating user {0}", level = Level.INFO, unexpectedExceptionLevel = Level.ERROR, exceptions = {
             @ExceptionLog(
                     value = BusinessException.class,
                     message = "The email provided is already in use."
@@ -100,6 +107,8 @@ public class UserServiceImpl implements IUserService {
     })
     @Transactional
     public UserResponse createUser(UserRequest userRequest) {
+        log.info("Creating user with email {}", userRequest);
+        log.info("Creating user with email {}", userRequest.getEmail());
         this.repository.findByEmail(userRequest.getEmail())
                 .ifPresent(user -> {
                     throw new BusinessException("This email is already in use.");
@@ -125,7 +134,7 @@ public class UserServiceImpl implements IUserService {
     }
 
     @Override
-    @Loggable(message = "Updating user with id {0}", level = Level.INFO, exceptionLevel = Level.ERROR, exceptions = {
+    @Loggable(message = "Updating user with id {0}", level = Level.INFO, unexpectedExceptionLevel = Level.ERROR, exceptions = {
             @ExceptionLog(
                     value = NotFoundException.class,
                     message = "User with id {0} not found."
@@ -137,7 +146,8 @@ public class UserServiceImpl implements IUserService {
             )
     })
     @Transactional
-    public UserResponse updateUser(Long id, UpdateUserRequest request) {
+    public UserResponse updateUser(@Mask Long id, UpdateUserRequest request) {
+        log.info("Updating user with ID {} and request {}", id, request);
         try {
             var user = this.repository.findById(id)
                     .orElseThrow(() -> new NotFoundException("User with ID " + id + " not found."));
@@ -161,7 +171,7 @@ public class UserServiceImpl implements IUserService {
     }
 
     @Override
-    @Loggable(message = "Deleting user with ID {0}", level = Level.INFO, exceptionLevel = Level.ERROR, exceptions = {
+    @Loggable(message = "Deleting user with ID {0}", level = Level.INFO, unexpectedExceptionLevel = Level.ERROR, exceptions = {
             @ExceptionLog(
                     value = NotFoundException.class,
                     message = "User with ID {0} not found."
@@ -173,7 +183,7 @@ public class UserServiceImpl implements IUserService {
             )
     })
     @Transactional
-    public void deleteUser(Long userId) {
+    public void deleteUser(@Mask Long userId) {
         try {
             var user = this.repository.findById(userId)
                     .orElseThrow(() -> new NotFoundException("User with ID " + userId + " not found."));
@@ -185,7 +195,7 @@ public class UserServiceImpl implements IUserService {
     }
 
     @Override
-    @Loggable(message = "Updating password for user with ID {0}", level = Level.INFO, exceptionLevel = Level.ERROR, exceptions = {
+    @Loggable(message = "Updating password for user with ID {0}", level = Level.INFO, unexpectedExceptionLevel = Level.ERROR, exceptions = {
             @ExceptionLog(
                     value = NotFoundException.class,
                     message = "User with ID {0} not found."

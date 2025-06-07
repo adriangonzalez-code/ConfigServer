@@ -1,5 +1,5 @@
 ```toml
-name = 'Update User By Email'
+name = 'Update User By Id'
 method = 'PUT'
 url = 'http://localhost:8080/api/users/1'
 sortWeight = 4000000
@@ -15,5 +15,6 @@ raw = '''
   "email": "jane@mail.com",
   "active": true,
   "roleId": 2,
+  "password": "newpassword123"
 }'''
 ```
