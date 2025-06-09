@@ -128,13 +128,13 @@ It is necessary to install the following dependencies before running the Config 
   - Ejecute `mvn clean install` prompt into each folder to install them in your local Maven repository.
 
 2. **Common Libs**
-    - The Config Server backend uses common libraries for shared functionality.
-    - These libraries are available in the repository `common-libs` and must be cloned and installed before building the Config Server.
-    - Clone the Common Libs repository and install it:
+  - The Config Server backend uses common libraries for shared functionality.
+  - These libraries are available in the repository `common-libs` and must be cloned and installed before building the Config Server.
+  - Clone the Parent repository and install it:
   ```
-    git clone https://github.com/adriangonzalez-code/common-libs.git
+  git clone https://github.com/adriangonzalez-code/parents.git
   ```
-    - Execute `mvn clean install` prompt into each folder to install them in your local Maven repository.
+  - Ejecute `mvn clean install` prompt into each folder to install them in your local Maven repository.
 
 ### JVM Variables
 
