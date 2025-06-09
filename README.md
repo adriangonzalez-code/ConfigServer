@@ -1,5 +1,10 @@
 # Config Server
 
+[![Build Status](https://travis-ci.org/config-server/config-server.svg?branch=main)](https://travis-ci.org/config-server/config-server)
+[![Coverage Status](https://coveralls.io/repos/github/config-server/config-server/badge.svg?branch=main)](https://coveralls.io/github/config-server/config-server?branch=main)
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
+[![Java Version](https://img.shields.io/badge/Java-21-blue)](https://www.oracle.com/java/technologies/javase/jdk21-archive-downloads.html)
+
 ## Table of Contents
 
 1. [Description](#description)
@@ -21,14 +26,14 @@
 ## Description
 
 Config Server is a robust and centralized solution for application configuration management, designed to provide
-efficient and secure handling of properties and secrets in an enterprise environment. It allows managing configurations
-through an intuitive user interface and provides secure access through APIs.
+efficient and secure handling of properties and secrets in an enterprise environment. It enables configuration
+management through an intuitive user interface and provides secure access through APIs.
 
 ## How It Works
 
 1. **User Authentication & Scope Creation**
+  - Users log into the Config Server application
 
-- Users log into the Config Server application
 - Create a new scope which generates an access key
 - The access key, URL, and scope are configured in the client API's bootstrap.properties
 - Users can add, modify, and delete properties within the created scope
@@ -87,13 +92,6 @@ through an intuitive user interface and provides secure access through APIs.
 
 - **Framework**: Spring Boot 3.x
 - **Java Version**: 21
-- **Main Dependencies**:
-  - spring-boot-starter-web  
-  - spring-boot-starter-data-jpa
-  - spring-boot-starter-security
-  - postgresql
-  - jasypt-spring-boot-starter
-  - lombok
 
 ### Frontend
 - **Framework**: Angular 17+
@@ -106,17 +104,8 @@ through an intuitive user interface and provides secure access through APIs.
 ### Database
 
 - **Engine**: PostgreSQL 15+
-- **Main Schema**:
-  ```
-  - scopes
-  - properties
-  - property_change_logs
-  - audit_logs
-  - users
-  - roles
-  ```
 
-## Configuration and Deployment
+## Configuration to Run Locally
 
 ### Prerequisites
 
@@ -124,6 +113,37 @@ through an intuitive user interface and provides secure access through APIs.
 - Node.js 18+
 - PostgreSQL 15+
 - Maven 3.8+
+
+### Dependencies
+
+It is necessary to install the following dependencies before running the Config Server application following the order below:
+
+1. **Java Parent**
+  - The Config Server backend is built on top of a parent project that provides common configurations and dependencies.
+  - This parent project is available in the repository `parents` and must be cloned and installed before building the Config Server. 
+  - Clone the Parent repository and install it:
+  ```
+  git clone https://github.com/adriangonzalez-code/parents.git
+  ```
+  - Ejecute `mvn clean install` prompt into each folder to install them in your local Maven repository.
+
+2. **Common Libs**
+    - The Config Server backend uses common libraries for shared functionality.
+    - These libraries are available in the repository `common-libs` and must be cloned and installed before building the Config Server.
+    - Clone the Common Libs repository and install it:
+  ```
+    git clone https://github.com/adriangonzalez-code/common-libs.git
+  ```
+    - Execute `mvn clean install` prompt into each folder to install them in your local Maven repository.
+
+### JVM Variables
+
+You must set the following JVM variables when running the Config Server application within JVM arguments or JVM Variables in your IDE:
+
+```properties
+-Dspring.config.location=classpath:properties/common/,classpath:properties/local/
+```
+## Configuration and Deployment
 
 ### Client Configuration
 
@@ -139,8 +159,18 @@ config-server:
 ### Authentication
 
 - JWT (JSON Web Tokens) for user authentication
+  - Token expiration: 24 hours
+  - Refresh token support
+  - Blacklisting of revoked tokens
 - Access tokens for client APIs authentication via scope and key
-- Automatic key rotation
+  - HMAC-SHA256 signature
+  - Automatic key rotation every 30 days
+  - Rate limiting: 1000 requests per minute
+- Security headers:
+  - HSTS enabled
+  - XSS protection
+  - CSRF tokens
+  - Content Security Policy
 
 ### Authorization
 
@@ -174,6 +204,30 @@ config-server:
 
 ### Available Metrics
 
+#### Application Metrics
+
+- Request count and latency percentiles
+- Error rate and types
+- Active sessions count
+- Cache hit/miss ratio
+- Database connection pool status
+
+#### Business Metrics
+
+- Configuration changes per hour
+- Most accessed properties
+- Failed authentication attempts
+- API usage by client
+- Property encryption usage
+
+#### System Metrics
+
+- JVM memory usage
+- Garbage collection statistics
+- Thread pool status
+- CPU usage
+- Disk I/O
+
 - API response times
 - Resource usage
 - Access statistics
@@ -183,9 +237,9 @@ config-server:
 
 ### Monitoring Systems Integration
 
-- Endpoints de actuator expuestos
-- Compatibilidad con Prometheus
-- Dashboards predefinidos para Grafana
+- Exposed actuator endpoints
+- Prometheus compatibility
+- Predefined Grafana dashboards
 
 ## Installation
 
@@ -257,7 +311,7 @@ config-server:
 
 ## Contributing
 
-Contributions are welcome. Please follow these steps:
+Contributions are welcome. Please follow these steps.
 
 ## License
 
