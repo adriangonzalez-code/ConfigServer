@@ -119,22 +119,22 @@ management through an intuitive user interface and provides secure access throug
 It is necessary to install the following dependencies before running the Config Server application following the order below:
 
 1. **Java Parent**
-  - The Config Server backend is built on top of a parent project that provides common configurations and dependencies.
-  - This parent project is available in the repository `parents` and must be cloned and installed before building the Config Server. 
-  - Clone the Parent repository and install it:
-  ```
-  git clone https://github.com/adriangonzalez-code/parents.git
-  ```
-  - Ejecute `mvn clean install` prompt into each folder to install them in your local Maven repository.
+   - The Config Server backend is built on top of a parent project that provides common configurations and dependencies.
+   - This parent project is available in the repository `parents` and must be cloned and installed before building the Config Server. 
+   - Clone the Parent repository and install it:
+   ```
+   git clone https://github.com/adriangonzalez-code/parents.git
+   ```
+   - Ejecute `mvn clean install` prompt into each folder to install them in your local Maven repository.
 
 2. **Common Libs**
-  - The Config Server backend uses common libraries for shared functionality.
-  - These libraries are available in the repository `common-libs` and must be cloned and installed before building the Config Server.
-  - Clone the Parent repository and install it:
-  ```
-  git clone https://github.com/adriangonzalez-code/common-libs.git
-  ```
-  - Ejecute `mvn clean install` prompt into each folder to install them in your local Maven repository.
+   - The Config Server backend uses common libraries for shared functionality.
+   - These libraries are available in the repository `common-libs` and must be cloned and installed before building the Config Server.
+   - Clone the Parent repository and install it:
+   ```
+   git clone https://github.com/adriangonzalez-code/common-libs.git
+   ```
+   - Ejecute `mvn clean install` prompt into each folder to install them in your local Maven repository.
 
 ### JVM Variables
 
