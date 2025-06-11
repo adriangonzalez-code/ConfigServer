@@ -1,8 +1,9 @@
 package com.driagon.services.configserver.dto.requests;
 
-import com.driagon.services.logging.annotations.Exclude;
+import com.driagon.services.configserver.constants.ValidationMessages;
 import com.driagon.services.logging.annotations.Mask;
 import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.Positive;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
@@ -26,19 +27,18 @@ public class UpdateUserRequest implements Serializable {
 
     private Long id;
 
-    @NotBlank
+    @NotBlank(message = ValidationMessages.CreateUser.FIRST_NAME_NOT_BLANK)
     private String firstName;
 
+    @NotBlank(message = ValidationMessages.CreateUser.LAST_NAME_NOT_BLANK)
     private String lastName;
 
     private boolean active;
 
-    @NotBlank
     @Mask
+    @NotBlank(message = ValidationMessages.CreateUser.EMAIL_NOT_BLANK)
     private String email;
 
+    @Positive(message = ValidationMessages.CreateUser.ROLE_ID_POSITIVE)
     private Long roleId;
-
-    @Exclude
-    private String password;
 }
