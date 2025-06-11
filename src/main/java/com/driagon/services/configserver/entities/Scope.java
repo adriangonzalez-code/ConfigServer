@@ -53,7 +53,7 @@ public class Scope implements Serializable {
     private String accessKey;
 
     @Column(name = "ACTIVE", nullable = false)
-    private boolean active = true;
+    private boolean active;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "CREATED_BY", nullable = false)
