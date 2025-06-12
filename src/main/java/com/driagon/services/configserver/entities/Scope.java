@@ -32,7 +32,7 @@ import java.util.List;
 @ToString
 @Builder
 @Entity
-@Table(name = "scopes")
+@Table(schema = "ISIS", name = "SCOPES")
 public class Scope implements Serializable {
 
     @Serial
@@ -53,7 +53,7 @@ public class Scope implements Serializable {
     private String accessKey;
 
     @Column(name = "ACTIVE", nullable = false)
-    private boolean active = true;
+    private boolean active;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "CREATED_BY", nullable = false)
@@ -69,6 +69,7 @@ public class Scope implements Serializable {
 
     @ManyToMany(fetch = FetchType.LAZY)
     @JoinTable(
+        schema = "ISIS",
         name = "user_scopes",
         joinColumns = @JoinColumn(name = "SCOPE_ID"),
         inverseJoinColumns = @JoinColumn(name = "USER_ID")
