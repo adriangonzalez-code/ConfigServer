@@ -21,6 +21,8 @@ public class SetPropertyResponse implements Serializable {
     @Serial
     private static final long serialVersionUID = -1776741077091613046L;
 
+    private Long id;
+
     private String key;
 
     private String value;

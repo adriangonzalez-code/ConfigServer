@@ -31,7 +31,7 @@ import java.time.LocalDateTime;
 @ToString
 @Builder
 @Entity
-@Table(name = "property_change_logs")
+@Table(schema = "ISIS", name = "PROPERTY_CHANGE_LOGS")
 public class PropertyChangeLog implements Serializable {
 
     @Serial

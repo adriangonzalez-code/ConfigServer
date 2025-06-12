@@ -30,7 +30,7 @@ import java.time.LocalDateTime;
 @ToString
 @Builder
 @Entity
-@Table(name = "users")
+@Table(schema = "ISIS", name = "USERS")
 public class User implements Serializable {
 
     @Serial

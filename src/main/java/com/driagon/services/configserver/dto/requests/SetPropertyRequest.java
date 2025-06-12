@@ -16,14 +16,16 @@ import java.io.Serializable;
 @AllArgsConstructor
 @ToString
 @Builder
-public class SetPropertiesRequest implements Serializable {
+public class SetPropertyRequest implements Serializable {
 
     @Serial
     private static final long serialVersionUID = 5879205714421235636L;
+
+    private Long id;
 
     private String key;
 
     private String value;
 
-    private boolean isKey;
+    private boolean secret;
 }

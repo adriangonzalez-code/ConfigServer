@@ -27,9 +27,8 @@ import java.time.LocalDateTime;
 @NoArgsConstructor
 @AllArgsConstructor
 @ToString
-@Builder
 @Entity
-@Table(name = "properties")
+@Table(schema = "ISIS", name = "PROPERTIES")
 public class Property implements Serializable {
 
     @Serial
@@ -40,7 +39,7 @@ public class Property implements Serializable {
     @Column(name = "ID")
     private Long id;
 
-    @Column(name = "KEY", length = 100, nullable = false)
+    @Column(name = "KEY", length = 100, nullable = false, unique = true)
     private String key;
 
     @Column(name = "VALUE", columnDefinition = "TEXT")
@@ -49,18 +48,14 @@ public class Property implements Serializable {
     @Column(name = "IS_SECRET", nullable = false)
     private boolean secret;
 
-    @Column(name = "DESCRIPTION", length = 255)
-    private String description;
-
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "SCOPE_ID", nullable = false)
+    @ToString.Exclude
     private Scope scope;
-
-    @Column(name = "ACTIVE", nullable = false)
-    private boolean active = true;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "CREATED_BY", nullable = false)
+    @ToString.Exclude
     private User createdBy;
 
     @Column(name = "CREATED_AT", nullable = false, updatable = false)
