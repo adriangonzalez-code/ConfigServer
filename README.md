@@ -143,6 +143,15 @@ You must set the following JVM variables when running the Config Server applicat
 ```properties
 -Dspring.config.location=classpath:properties/common/,classpath:properties/local/
 ```
+
+### DB Setup
+
+Run the following docker command to start a PostgreSQL database instance:
+
+```bash
+  docker run -e POSTGRES_USER=postgres -e POSTGRES_PASSWORD=admin123 -e POSTGRES_DB=configserver -p 5432:5432 -d postgres:latest
+```
+
 ## Configuration and Deployment
 
 ### Client Configuration

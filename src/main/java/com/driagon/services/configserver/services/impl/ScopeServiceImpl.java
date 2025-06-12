@@ -73,7 +73,7 @@ public class ScopeServiceImpl implements IScopeService {
 
             if (exists) throw new BusinessException("Scope with name " + request.getScopeName() + " already exists.");
 
-            User user = this.userRepository.findUserById(6L); // Assuming a user ID is provided for the createdBy field
+            User user = this.userRepository.findAll().stream().findFirst().orElseThrow(() -> new NotFoundException("No user found."));
 
             Scope scope = this.mapper.mapCreateScopeRequestToScopeEntity(request);
             scope.setCreatedBy(user);

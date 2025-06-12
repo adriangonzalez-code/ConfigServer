@@ -9,7 +9,7 @@ id = '2d816549-9482-402c-8a7d-2559776ad0c5'
 type = 'JSON'
 raw = '''
 {
-  "scopeName": "example-scope",
-  "description": "This scope allows access to the example API endpoints.",
+  "scopeName": "example_api_scope",
+  "description": "This scope allows access to the example API.",",
 }'''
 ```

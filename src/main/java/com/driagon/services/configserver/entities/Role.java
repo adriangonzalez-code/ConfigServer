@@ -26,7 +26,7 @@ import java.time.LocalDateTime;
 @ToString
 @Builder
 @Entity
-@Table(name = "roles")
+@Table(schema = "ISIS", name = "ROLES")
 public class Role implements Serializable {
 
     @Serial
