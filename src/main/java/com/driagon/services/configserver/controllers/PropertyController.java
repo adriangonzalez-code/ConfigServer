@@ -6,6 +6,7 @@ import com.driagon.services.configserver.services.IPropertyService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -21,6 +22,15 @@ import java.util.Set;
 public class PropertyController {
 
     private final IPropertyService propertyService;
+
+    @GetMapping("/{scopeId}/scope")
+    public ResponseEntity<Set<SetPropertyResponse>> getAllPropertiesByScope(@PathVariable String scopeId) {
+        Set<SetPropertyResponse> properties = propertyService.getAllPropertiesByScope(Long.valueOf(scopeId));
+        if (properties.isEmpty()) {
+            return ResponseEntity.noContent().build();
+        }
+        return ResponseEntity.ok(properties);
+    }
 
     @PutMapping("/{scopeId}/scope")
     public ResponseEntity<Set<SetPropertyResponse>> setProperties(@PathVariable String scopeId, @RequestBody Set<SetPropertyRequest> request) {

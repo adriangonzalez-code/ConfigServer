@@ -27,6 +27,7 @@ import java.time.LocalDateTime;
 @NoArgsConstructor
 @AllArgsConstructor
 @ToString
+@Builder
 @Entity
 @Table(schema = "ISIS", name = "PROPERTIES")
 public class Property implements Serializable {

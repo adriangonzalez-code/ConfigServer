@@ -7,5 +7,7 @@ import java.util.Set;
 
 public interface IPropertyService {
 
+    Set<SetPropertyResponse> getAllPropertiesByScope(Long scopeId);
+
     Set<SetPropertyResponse> setProperties(Long scopeRequest, Set<SetPropertyRequest> request);
 }

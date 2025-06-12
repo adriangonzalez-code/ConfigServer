@@ -42,6 +42,33 @@ public class PropertyServiceImpl implements IPropertyService {
     private final static MaskedLogger log = MaskedLogger.getLogger(PropertyServiceImpl.class);
 
     @Override
+    @Loggable(message = "Fetching all properties for scope: {0}", exceptions = {
+            @ExceptionLog(value = NotFoundException.class, message = "Scope not found: {0}"),
+            @ExceptionLog(value = ProcessException.class, message = "Error processing properties for scope: {0}")
+    })
+    public Set<SetPropertyResponse> getAllPropertiesByScope(Long scopeId) {
+        try {
+            if (!this.scopeRepository.existsById(scopeId)) {
+                throw new NotFoundException("Scope not found: " + scopeId);
+            }
+
+            Set<Property> properties = this.propertyRepository.findByScope_Id(scopeId);
+
+            if (CollectionUtils.isEmpty(properties)) {
+                log.info("No properties found for scope: {}", scopeId);
+                return Set.of();
+            }
+
+            return properties.stream()
+                    .map(this.mapper::mapPropertyEntityToSetPropertyResponse)
+                    .collect(Collectors.toSet());
+
+        } catch (DataAccessException ex) {
+            throw new ProcessException(ex.getMessage());
+        }
+    }
+
+    @Override
     @Loggable(message = "Setting properties for scope: {0}", exceptions = {
             @ExceptionLog(value = NotFoundException.class, message = "Scope not found: {0}"),
             @ExceptionLog(value = ProcessException.class, message = "Error processing properties for scope: {0}")
