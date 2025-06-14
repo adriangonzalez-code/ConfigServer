@@ -15,11 +15,9 @@ import com.driagon.services.logging.annotations.Loggable;
 import com.driagon.services.logging.annotations.Mask;
 import com.driagon.services.logging.constants.Level;
 import com.driagon.services.logging.utils.MaskedLogger;
-import com.driagon.services.logging.utils.MaskingUtils;
 import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
-import org.jasypt.encryption.StringEncryptor;
 import org.springframework.dao.DataAccessException;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -36,7 +34,7 @@ public class UserServiceImpl implements IUserService {
 
     private final UserMapper mapper;
 
-    private final StringEncryptor encryptor;
+    private final PasswordEncoder encryptor;
 
     private final MaskedLogger log = MaskedLogger.getLogger(this.getClass());
 
@@ -121,7 +119,7 @@ public class UserServiceImpl implements IUserService {
         // User does not exist, proceed with creation
         var user = this.mapper.mapUserRequestToUserEntity(userRequest);
         log.info("Encrypting password for user {}", user.getEmail());
-        user.setPassword(this.encryptor.encrypt(user.getPassword()));
+        user.setPassword(this.encryptor.encode(user.getPassword()));
         user.setRole(role);
 
         try {
@@ -212,7 +210,7 @@ public class UserServiceImpl implements IUserService {
                     .orElseThrow(() -> new NotFoundException("User with ID " + userId + " not found."));
 
             log.info("Encrypting new password for user {}", user.getEmail());
-            user.setPassword(this.encryptor.encrypt(newPassword));
+            user.setPassword(this.encryptor.encode(newPassword));
             this.repository.save(user);
         } catch (DataAccessException e) {
             throw new ProcessException("An error occurred while accessing the database.");
