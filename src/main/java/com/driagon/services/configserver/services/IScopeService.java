@@ -13,4 +13,6 @@ public interface IScopeService {
     ScopeResponse getScopeById(Long id);
 
     CreateScopeResponse createScope(CreateScopeRequest request);
+
+    boolean setUsersToScope(Long scopeId, Set<String> emails);
 }

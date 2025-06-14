@@ -16,12 +16,13 @@
 7. [Security](#security)
 8. [API REST](#api-rest)
 9. [Monitoring and Logs](#monitoring-and-logs)
-10. [Installation](#installation)
-11. [Development](#development)
-12. [Testing](#testing)
-13. [Troubleshooting](#troubleshooting)
-14. [Contributing](#contributing)
-15. [License](#license)
+10. [Git Flow](#git-flow)
+11. [Installation](#installation)
+12. [Development](#development)
+13. [Testing](#testing)
+14. [Troubleshooting](#troubleshooting)
+15. [Contributing](#contributing)
+16. [License](#license)
 
 ## Description
 
@@ -249,6 +250,195 @@ config-server:
 - Exposed actuator endpoints
 - Prometheus compatibility
 - Predefined Grafana dashboards
+
+## Git Flow
+
+Este proyecto utiliza **Git Flow** como estrategia de branching. Git Flow proporciona un flujo de trabajo robusto para el desarrollo colaborativo y el manejo de releases.
+
+### 📌 Estructura de Branches
+
+#### Branches Principales
+
+- **`master`**: 
+  - Branch de producción
+  - Contiene el código estable listo para deployar a producción
+  - Solo se hace merge aquí desde `release/` branches después de completar el proceso de release
+
+- **`develop`**: 
+  - Branch principal de desarrollo
+  - Integra los cambios estables desde `develop_next_release`
+
+- **`develop_next_release`**:
+  - Branch con cambios estables y listos para deployar a producción
+  - Se integra a `develop` una vez que los cambios están validados
+  - Base para crear `release/` branches
+
+#### Branches de Soporte
+
+- **`feature/`**: 
+  - Branches para desarrollo de nuevas características
+  - Se crean desde `develop_next_release`
+  - Se mergean de vuelta a `develop_next_release` una vez completadas
+  - Nomenclatura: `feature/nombre-descriptivo`
+
+- **`release/`**:
+  - Branches para preparar nuevas releases
+  - Se crean desde `develop`
+  - Permiten últimos ajustes antes del release
+  - Se mergean a `master` y `develop`
+  - Nomenclatura: `release/v1.2.3`
+
+### 🚀 Flujo de Trabajo
+
+#### 1. Desarrollo de Nueva Característica
+
+```bash
+# Crear y cambiar a nuevo feature branch
+git flow feature start nueva-caracteristica
+
+# Desarrollar la característica...
+git add .
+git commit -m "feat: implementar nueva característica"
+
+# Finalizar feature (merge a develop)
+git flow feature finish nueva-caracteristica
+```
+
+#### 2. Preparar Release
+
+```bash
+# Crear release branch desde develop_next_release
+git flow release start v1.2.0
+
+# Realizar últimos ajustes para el release...
+git add .
+git commit -m "chore: preparar release v1.2.0"
+
+# Finalizar release (merge a master y develop)
+git flow release finish v1.2.0
+```
+
+#### 3. Hotfix Crítico
+
+```bash
+# Crear hotfix branch desde master
+git flow hotfix start fix-critico
+
+# Implementar el fix...
+git add .
+git commit -m "fix: resolver problema crítico en producción"
+
+# Finalizar hotfix (merge a master y develop)
+git flow hotfix finish fix-critico
+```
+
+### 📋 Comandos Principales
+
+#### Inicialización
+
+```bash
+# Inicializar Git Flow (ya realizado en este proyecto)
+git flow init
+```
+
+#### Features
+
+```bash
+# Listar features
+git flow feature list
+
+# Crear nueva feature
+git flow feature start <nombre-feature>
+
+# Publicar feature en remoto
+git flow feature publish <nombre-feature>
+
+# Obtener feature del remoto
+git flow feature pull origin <nombre-feature>
+
+# Finalizar feature
+git flow feature finish <nombre-feature>
+```
+
+#### Releases
+
+```bash
+# Crear nuevo release
+git flow release start <version>
+
+# Publicar release
+git flow release publish <version>
+
+# Finalizar release
+git flow release finish <version>
+```
+
+#### Hotfixes
+
+```bash
+# Crear hotfix
+git flow hotfix start <nombre-hotfix>
+
+# Finalizar hotfix
+git flow hotfix finish <nombre-hotfix>
+```
+
+### 🔄 Integración Continua
+
+#### Branch Policies
+
+- **`master`**: Requiere pull request y al menos 2 revisiones
+- **`develop`**: Requiere pull request y al menos 1 revisión
+- **`develop_next_release`**: Requiere pull request y testing automático
+
+#### Automated Testing
+
+- Todos los `feature/` branches ejecutan tests unitarios
+- `develop_next_release` ejecuta tests de integración
+- `release/` branches ejecutan suite completa de tests
+- `master` despliega automáticamente a producción tras tests exitosos
+
+### 📝 Convenciones de Commits
+
+Utilizamos [Conventional Commits](https://www.conventionalcommits.org/) para mantener un historial limpio:
+
+```bash
+feat: nueva característica
+fix: corrección de bug
+docs: cambios en documentación
+style: cambios de formato
+refactor: refactorización de código
+test: agregar o modificar tests
+chore: tareas de mantenimiento
+```
+
+### 🎯 Mejores Prácticas
+
+1. **Mantén features pequeños**: Features grandes son difíciles de revisar y mergear
+2. **Usa nombres descriptivos**: `feature/user-authentication` mejor que `feature/auth`
+3. **Actualiza regularmente**: Haz rebase o merge de `develop` en tus features frecuentemente
+4. **Tests antes de merge**: Asegúrate que todos los tests pasen antes de finalizar branches
+5. **Documenta cambios**: Actualiza documentación relevante en cada feature
+6. **Code review**: Todas las features deben pasar por code review antes del merge
+
+### 🆘 Comandos de Emergencia
+
+```bash
+# Cancelar feature en progreso
+git flow feature delete <nombre-feature>
+
+# Revertir último commit en develop
+git revert HEAD
+
+# Crear hotfix urgente saltando proceso normal
+git checkout master
+git checkout -b hotfix/emergency-fix
+# ... hacer cambios ...
+git checkout master
+git merge hotfix/emergency-fix
+git checkout develop
+git merge hotfix/emergency-fix
+```
 
 ## Installation
 
