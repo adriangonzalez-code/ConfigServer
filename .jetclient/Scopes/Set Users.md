@@ -10,7 +10,6 @@ type = 'JSON'
 raw = '''
 [
   "pepe@mail.com",
-  "john@mail.com",
-  "other@mail.com"
+  "john@mail.com"
 ]'''
 ```

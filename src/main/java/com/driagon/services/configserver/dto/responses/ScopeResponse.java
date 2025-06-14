@@ -9,6 +9,7 @@ import lombok.ToString;
 
 import java.io.Serial;
 import java.io.Serializable;
+import java.util.Set;
 
 @Getter
 @Setter
@@ -24,7 +25,7 @@ public class ScopeResponse implements Serializable {
     private Long id;
     private String scopeName;
     private String description;
-    private boolean active;
     private String createdBy;
     private String createdAt;
+    private Set<String> users;
 }

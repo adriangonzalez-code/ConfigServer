@@ -17,6 +17,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.ToString;
+import org.apache.commons.lang3.StringUtils;
 import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UpdateTimestamp;
 
@@ -24,6 +25,7 @@ import java.io.Serial;
 import java.io.Serializable;
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Objects;
 
 @Getter
 @Setter
@@ -52,11 +54,9 @@ public class Scope implements Serializable {
     @Column(name = "ACCESS_KEY", length = 100, nullable = false, unique = true)
     private String accessKey;
 
-    @Column(name = "ACTIVE", nullable = false)
-    private boolean active;
-
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "CREATED_BY", nullable = false)
+    @ToString.Exclude
     private User createdBy;
 
     @Column(name = "CREATED_AT", nullable = false, updatable = false)
@@ -74,5 +74,18 @@ public class Scope implements Serializable {
         joinColumns = @JoinColumn(name = "SCOPE_ID"),
         inverseJoinColumns = @JoinColumn(name = "USER_ID")
     )
+    @ToString.Exclude
     private List<User> users;
+
+    @Override
+    public boolean equals(Object o) {
+        if (o == null || getClass() != o.getClass()) return false;
+        Scope scope = (Scope) o;
+        return StringUtils.equalsIgnoreCase(name, scope.name);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hashCode(name);
+    }
 }

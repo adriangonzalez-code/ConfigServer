@@ -8,6 +8,7 @@ import com.driagon.services.configserver.entities.Property;
 import com.driagon.services.configserver.entities.Scope;
 import com.driagon.services.configserver.entities.User;
 import com.driagon.services.configserver.mappers.ScopeMapper;
+import com.driagon.services.configserver.mappers.UserMapper;
 import com.driagon.services.configserver.repositories.IScopeRepository;
 import com.driagon.services.configserver.repositories.IUserRepository;
 import com.driagon.services.configserver.services.IScopeService;
@@ -36,9 +37,11 @@ public class ScopeServiceImpl implements IScopeService {
 
     private final IScopeRepository scopeRepository;
 
+    private final IUserRepository userRepository;
+
     private final ScopeMapper mapper;
 
-    private final IUserRepository userRepository;
+    private final UserMapper userMapper;
 
     private static final MaskedLogger log = MaskedLogger.getLogger(ScopeServiceImpl.class);
 
@@ -47,11 +50,9 @@ public class ScopeServiceImpl implements IScopeService {
     @Loggable
     public Set<ScopeResponse> getAllScopes() {
         try {
-            List<Scope> scopes = this.scopeRepository.findAll();
+            Set<Scope> scopes = new HashSet<>(this.scopeRepository.findAll());
 
-            return scopes.stream()
-                    .map(this.mapper::mapScopeEntityToScopeResponse)
-                    .collect(Collectors.toSet());
+            return this.mapper.mapScopeEntitiesToScopeResponses(scopes);
         } catch (DataAccessException ex) {
             throw new ProcessException("Error while retrieving all scopes: " + ex.getMessage());
         }
