@@ -22,4 +22,13 @@ public final class ValidationMessages {
         public static final String ID_NOT_BLANK = "Scope ID must not be blank";
         public static final String ID_DIGITS = "Scope ID must be a number";
     }
+
+    public static class ScopeController {
+        public static class SetUsersToScope {
+            public static final String SCOPE_ID_POSITIVE = "Scope ID must be a positive number";
+            public static final String SCOPE_ID_NOT_BLANK = "Scope ID must not be blank";
+            public static final String SCOPE_ID_DIGITS = "Scope ID must be a number";
+            public static final String EMAILS_NOT_EMPTY = "Emails must not be empty";
+        }
+    }
 }

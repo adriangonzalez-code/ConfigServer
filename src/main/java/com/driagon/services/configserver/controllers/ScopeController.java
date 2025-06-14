@@ -17,6 +17,7 @@ import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
@@ -57,5 +58,21 @@ public class ScopeController {
     public ResponseEntity<CreateScopeResponse> createScope(@RequestBody CreateScopeRequest request) {
         CreateScopeResponse scope = this.scopeService.createScope(request);
         return ResponseEntity.status(HttpStatus.CREATED).body(scope);
+    }
+
+    @PutMapping("/{scopeId}/users")
+    public ResponseEntity<Void> setUsersToScope(
+            @PathVariable
+            @NotBlank(message = ValidationMessages.ScopeController.SetUsersToScope.SCOPE_ID_NOT_BLANK)
+            @Digits(integer = 10, fraction = 0, message = ValidationMessages.ScopeController.SetUsersToScope.SCOPE_ID_DIGITS)
+            @Positive(message = ValidationMessages.ScopeController.SetUsersToScope.SCOPE_ID_POSITIVE)
+            String scopeId,
+            @RequestBody Set<String> emails) {
+        boolean result = this.scopeService.setUsersToScope(Long.valueOf(scopeId), emails);
+        if (result) {
+            return ResponseEntity.ok().build();
+        } else {
+            throw new NotFoundException("Scope with ID " + scopeId + " not found or no users updated.");
+        }
     }
 }
