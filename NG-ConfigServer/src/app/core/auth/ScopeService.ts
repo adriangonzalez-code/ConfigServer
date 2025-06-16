@@ -1,0 +1,26 @@
+import { Injectable } from '@angular/core';
+import { HttpClient, HttpParams } from '@angular/common/http';
+import { Observable } from 'rxjs';
+import {Scope} from "../../features/scopes/models/scope.model";
+
+@Injectable({
+  providedIn: 'root'
+})
+export class ScopesService {
+  private readonly apiUrl = 'http://localhost:8080/api/scopes';
+
+  constructor(private http: HttpClient) {}
+
+  getScopes(search?: string): Observable<Scope[]> {
+    let params = new HttpParams();
+    if (search) {
+      params = params.set('search', search);
+      return this.http.get<Scope[]>(this.apiUrl, { params });
+    }
+    return this.http.get<Scope[]>(this.apiUrl);
+  }
+
+  createScope(scope: Partial<Scope>): Observable<Scope> {
+    return this.http.post<Scope>(this.apiUrl, scope);
+  }
+}

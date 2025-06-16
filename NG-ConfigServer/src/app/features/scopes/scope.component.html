@@ -17,12 +17,16 @@
     <tr>
       <th class="text-left px-4 py-2">Name</th>
       <th class="text-left px-4 py-2">Description</th>
+      <th class="text-left px-4 py-2">Created By</th>
+      <th class="text-left px-4 py-2">Created At</th>
     </tr>
     </thead>
     <tbody>
     <tr *ngFor="let scope of scopes">
-      <td class="border-t px-4 py-2">{{ scope.name }}</td>
+      <td class="border-t px-4 py-2">{{ scope.scopeName }}</td>
       <td class="border-t px-4 py-2">{{ scope.description }}</td>
+      <td class="border-t px-4 py-2">{{ scope.createdBy }}</td>
+      <td class="border-t px-4 py-2">{{ scope.createdAt | date:'short' }}</td>
     </tr>
     </tbody>
   </table>
@@ -33,7 +37,7 @@
   <div class="bg-white p-6 rounded w-96">
     <h2 class="text-xl font-semibold mb-4">Create New Scope</h2>
     <form (ngSubmit)="createScope()" #scopeForm="ngForm">
-      <input [(ngModel)]="newScope.name" name="name" placeholder="Name" required class="border w-full px-3 py-2 mb-3" />
+      <input [(ngModel)]="newScope.scopeName" name="name" placeholder="Name" required class="border w-full px-3 py-2 mb-3" />
       <input [(ngModel)]="newScope.description" name="description" placeholder="Description" required class="border w-full px-3 py-2 mb-3" />
       <div class="flex justify-end space-x-2">
         <button type="button" (click)="closeModal()" class="px-4 py-2 bg-gray-300 rounded">Cancel</button>
