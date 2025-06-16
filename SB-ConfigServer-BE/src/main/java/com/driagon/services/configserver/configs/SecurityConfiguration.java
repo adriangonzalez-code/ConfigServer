@@ -1,0 +1,91 @@
+package com.driagon.services.configserver.configs;
+
+import com.driagon.services.configserver.filters.JwtAuthenticationFilter;
+import com.driagon.services.configserver.filters.ScopeKeyAuthFilter;
+import com.driagon.services.configserver.providers.CustomAuthenticationProvider;
+import lombok.RequiredArgsConstructor;
+import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Configuration;
+import org.springframework.http.HttpMethod;
+import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
+import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
+import org.springframework.security.config.annotation.web.builders.HttpSecurity;
+import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
+import org.springframework.security.config.http.SessionCreationPolicy;
+import org.springframework.security.core.userdetails.UserDetailsService;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.security.web.SecurityFilterChain;
+import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
+
+@Configuration
+@EnableMethodSecurity
+@RequiredArgsConstructor
+public class SecurityConfiguration {
+
+    private final JwtAuthenticationFilter jwtAuthenticationFilter;
+
+    private final ScopeKeyAuthFilter scopeKeyAuthFilter;
+
+    @Bean
+    public PasswordEncoder passwordEncoder() {
+        return new BCryptPasswordEncoder();
+    }
+
+    @Bean
+    public CustomAuthenticationProvider customAuthenticationProvider(UserDetailsService userDetailsService, PasswordEncoder passwordEncoder) {
+        return new CustomAuthenticationProvider(userDetailsService, passwordEncoder);
+    }
+
+    @Bean
+    public SecurityFilterChain filterChain(HttpSecurity http, CustomAuthenticationProvider authenticationProvider) throws Exception {
+        return http
+                .csrf(AbstractHttpConfigurer::disable)
+                .sessionManagement(sess -> sess.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
+                .authenticationProvider(authenticationProvider)
+                .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class)
+                .addFilterBefore(scopeKeyAuthFilter, JwtAuthenticationFilter.class)
+                .authorizeHttpRequests(auth -> auth
+                        // Rutas públicas (autenticación)
+                        .requestMatchers("/api/auth/**").permitAll()
+
+                        // Rutas GET - acceso para ADMIN y USER
+                        .requestMatchers(HttpMethod.GET, "/api/users/**").hasAnyRole("ADMIN", "USER")
+                        .requestMatchers(HttpMethod.GET, "/api/scopes/**").hasAnyRole("ADMIN", "USER")
+                        .requestMatchers(HttpMethod.GET, "/api/properties/**").hasAnyRole("ADMIN", "USER")
+                        .requestMatchers(HttpMethod.GET, "/api/ui/**").hasAnyRole("ADMIN", "USER")
+                        .requestMatchers(HttpMethod.GET, "/api/driver/**").hasAnyRole("ADMIN", "USER")
+
+                        // Rutas POST, PUT, DELETE - solo ADMIN
+                        .requestMatchers(HttpMethod.POST, "/api/users/**").hasRole("ADMIN")
+                        .requestMatchers(HttpMethod.PUT, "/api/users/**").hasRole("ADMIN")
+                        .requestMatchers(HttpMethod.DELETE, "/api/users/**").hasRole("ADMIN")
+
+                        .requestMatchers(HttpMethod.POST, "/api/scopes/**").hasRole("ADMIN")
+                        .requestMatchers(HttpMethod.PUT, "/api/scopes/**").hasRole("ADMIN")
+                        .requestMatchers(HttpMethod.DELETE, "/api/scopes/**").hasRole("ADMIN")
+
+                        .requestMatchers(HttpMethod.POST, "/api/properties/**").hasRole("ADMIN")
+                        .requestMatchers(HttpMethod.PUT, "/api/properties/**").hasRole("ADMIN")
+                        .requestMatchers(HttpMethod.DELETE, "/api/properties/**").hasRole("ADMIN")
+
+                        .requestMatchers(HttpMethod.POST, "/api/ui/**").hasRole("ADMIN")
+                        .requestMatchers(HttpMethod.PUT, "/api/ui/**").hasRole("ADMIN")
+                        .requestMatchers(HttpMethod.DELETE, "/api/ui/**").hasRole("ADMIN")
+
+                        .requestMatchers(HttpMethod.POST, "/api/driver/**").hasRole("ADMIN")
+                        .requestMatchers(HttpMethod.PUT, "/api/driver/**").hasRole("ADMIN")
+                        .requestMatchers(HttpMethod.DELETE, "/api/driver/**").hasRole("ADMIN")
+
+                        .anyRequest().denyAll()
+                ).build();
+    }
+
+    @Bean
+    public AuthenticationManager authenticationManager(HttpSecurity http, CustomAuthenticationProvider authenticationProvider) throws Exception {
+        return http.getSharedObject(AuthenticationManagerBuilder.class)
+                .authenticationProvider(authenticationProvider)
+                .build();
+    }
+}
