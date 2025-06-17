@@ -1,8 +1,8 @@
 import { Routes } from '@angular/router';
-import {LoginComponent} from "./features/login/login.component";
-import {LayoutComponent} from "./shared/layout/layout.component";
-import {canActivateGuard} from "./core/auth/AuthGuard";
-//import { canActivateGuard } from './core/auth/auth.guard';
+import { LoginComponent } from "./features/login/login.component";
+import { LayoutComponent } from "./shared/layout/layout.component";
+import { canActivateGuard } from "./core/auth/AuthGuard";
+import { ScopeDetailsComponent } from "./features/scope-details/scope-details.component";
 
 export const routes: Routes = [
   { path: 'login', component: LoginComponent },
@@ -12,8 +12,7 @@ export const routes: Routes = [
     canActivate: [canActivateGuard],
     children: [
       { path: '', loadComponent: () => import('./features/scopes/scope.component').then(m => m.ScopesComponent) },
-      /*{ path: 'dashboard', loadComponent: () => import('./dashboard/dashboard.component').then(m => m.DashboardComponent) },
-      { path: 'properties', loadComponent: () => import('./properties/properties.component').then(m => m.PropertiesComponent) },*/
+      { path: 'scopes/:id', component: ScopeDetailsComponent },
       { path: '', redirectTo: 'dashboard', pathMatch: 'full' }
     ]
   },

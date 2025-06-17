@@ -5,4 +5,5 @@ export interface Scope {
   accessKey: string;
   createdBy: string;
   createdAt: string;
+  users: String[];
 }

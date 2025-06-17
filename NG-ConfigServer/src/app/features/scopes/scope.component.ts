@@ -1,9 +1,11 @@
 import { Component, OnInit } from '@angular/core';
 import Swal from 'sweetalert2';
-import {ScopesService} from "../../core/auth/ScopeService";
-import {Scope} from "./models/scope.model";
-import {FormsModule} from "@angular/forms";
-import {DatePipe, NgForOf, NgIf} from "@angular/common";
+import { ScopesService } from "../../core/services/ScopeService";
+import { Scope } from "./models/scope.model";
+import { FormsModule } from "@angular/forms";
+import { DatePipe, NgForOf, NgIf } from "@angular/common";
+import { trigger, transition, style, animate, keyframes } from '@angular/animations';
+import {RouterLink} from "@angular/router";
 
 @Component({
   selector: 'app-scopes',
@@ -12,7 +14,34 @@ import {DatePipe, NgForOf, NgIf} from "@angular/common";
     FormsModule,
     NgForOf,
     NgIf,
-    DatePipe
+    DatePipe,
+    RouterLink
+  ],
+  animations: [
+    trigger('fadeIn', [
+      transition(':enter', [
+        style({ opacity: 0 }),
+        animate('{{timing}}', style({ opacity: 1 }))
+      ], { params: { timing: '0.3s' } }),
+      transition(':leave', [
+        animate('{{timing}}', style({ opacity: 0 }))
+      ], { params: { timing: '0.3s' } })
+    ]),
+    trigger('slideZoomIn', [
+      transition(':enter', [
+        animate('{{timing}} ease-out', keyframes([
+          style({ opacity: 0, transform: 'translateY({{translate}}) scale(0.95)', offset: 0 }),
+          style({ opacity: 1, transform: 'translateY(0) scale(1)', offset: 1 })
+        ]))
+      ], { params: { timing: '0.4s', translate: '-30px' } }),
+
+      transition(':leave', [
+        animate('{{timing}} ease-in', keyframes([
+          style({ opacity: 1, transform: 'translateY(0) scale(1)', offset: 0 }),
+          style({ opacity: 0, transform: 'translateY({{translate}}) scale(0.95)', offset: 1 })
+        ]))
+      ], { params: { timing: '0.4s', translate: '-30px' } })
+    ])
   ],
   templateUrl: './scope.component.html'
 })

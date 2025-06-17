@@ -23,4 +23,8 @@ export class ScopesService {
   createScope(scope: Partial<Scope>): Observable<Scope> {
     return this.http.post<Scope>(this.apiUrl, scope);
   }
+
+  getScopeById(id: number): Observable<Scope> {
+    return this.http.get<Scope>(`${this.apiUrl}/${id}`);
+  }
 }
