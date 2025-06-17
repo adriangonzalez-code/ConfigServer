@@ -1,43 +1,52 @@
-<div class="p-6">
+<div class="p-6 bg-white rounded-xl shadow-md">
   <div class="flex justify-between items-center mb-4">
-    <input [(ngModel)]="searchTerm"
-           (input)="searchScopes()"
-           placeholder="Search scopes..."
-           class="border rounded px-4 py-2 w-1/3" />
+    <input
+      type="text"
+      placeholder="Search scopes..."
+      [(ngModel)]="searchTerm"
+      (input)="searchScopes()"
+      class="px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+    />
 
-    <button (click)="openModal()"
-            class="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded">
+    <button
+      (click)="openModal()"
+      class="bg-blue-600 text-white px-4 py-2 rounded-lg shadow hover:bg-blue-700 transition duration-200"
+    >
       + New Scope
     </button>
   </div>
 
-  <!-- Tabla de scopes -->
-  <table class="w-full bg-white rounded shadow">
-    <thead class="bg-gray-100">
+  <table class="min-w-full border-collapse rounded-md overflow-hidden shadow-md">
+    <thead class="bg-gray-200 text-gray-700">
     <tr>
       <th class="text-left px-4 py-2">Name</th>
       <th class="text-left px-4 py-2">Description</th>
+      <th class="text-left px-4 py-2">Created By</th>
+      <th class="text-left px-4 py-2">Created At</th>
     </tr>
     </thead>
     <tbody>
-    <tr *ngFor="let scope of scopes">
-      <td class="border-t px-4 py-2">{{ scope.name }}</td>
-      <td class="border-t px-4 py-2">{{ scope.description }}</td>
+    <tr *ngFor="let scope of scopes" class="hover:bg-gray-100 transition duration-200" [routerLink]="['/scopes', scope.id]">
+      <td class="px-4 py-2">{{ scope.scopeName }}</td>
+      <td class="px-4 py-2">{{ scope.description }}</td>
+      <td class="px-4 py-2">{{ scope.createdBy }}</td>
+      <td class="px-4 py-2">{{ scope.createdAt | date: 'short' }}</td>
     </tr>
     </tbody>
   </table>
 </div>
 
-<!-- Modal para crear nuevo scope -->
-<div *ngIf="showModal" class="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center z-50">
-  <div class="bg-white p-6 rounded w-96">
+<div *ngIf="showModal" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50" [@fadeIn]="{value: '', params: {timing: '0.3s'}}">
+  <!-- Contenido con slide + zoom -->
+  <div class="bg-white rounded-xl shadow-lg p-6 w-full max-w-md" [@slideZoomIn]="{value: '', params: {timing: '0.4s', translate: '-30px'}}">
     <h2 class="text-xl font-semibold mb-4">Create New Scope</h2>
     <form (ngSubmit)="createScope()" #scopeForm="ngForm">
-      <input [(ngModel)]="newScope.name" name="name" placeholder="Name" required class="border w-full px-3 py-2 mb-3" />
-      <input [(ngModel)]="newScope.description" name="description" placeholder="Description" required class="border w-full px-3 py-2 mb-3" />
+      <input [(ngModel)]="newScope.scopeName" name="name" placeholder="Name" required class="border w-full px-3 py-2 mb-3"/>
+      <input [(ngModel)]="newScope.description" name="description" placeholder="Description" required class="border w-full px-3 py-2 mb-3"/>
       <div class="flex justify-end space-x-2">
         <button type="button" (click)="closeModal()" class="px-4 py-2 bg-gray-300 rounded">Cancel</button>
-        <button type="submit" [disabled]="scopeForm.invalid" class="px-4 py-2 bg-blue-600 text-white rounded">Create</button>
+        <button type="submit" [disabled]="scopeForm.invalid" class="px-4 py-2 rounded-lg bg-blue-600 text-white hover:bg-blue-700 cursor-pointer">Create
+        </button>
       </div>
     </form>
   </div>

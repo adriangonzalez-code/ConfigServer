@@ -1,68 +1,107 @@
 import { Component, OnInit } from '@angular/core';
-import { HttpClient, HttpParams } from '@angular/common/http';
 import Swal from 'sweetalert2';
+import { ScopesService } from "../../core/services/ScopeService";
+import { Scope } from "./models/scope.model";
 import { FormsModule } from "@angular/forms";
+import { DatePipe, NgForOf, NgIf } from "@angular/common";
+import { trigger, transition, style, animate, keyframes } from '@angular/animations';
+import {RouterLink} from "@angular/router";
 
 @Component({
   selector: 'app-scopes',
   standalone: true,
   imports: [
-    FormsModule
+    FormsModule,
+    NgForOf,
+    NgIf,
+    DatePipe,
+    RouterLink
   ],
-  template: 'scope.component.html'
+  animations: [
+    trigger('fadeIn', [
+      transition(':enter', [
+        style({ opacity: 0 }),
+        animate('{{timing}}', style({ opacity: 1 }))
+      ], { params: { timing: '0.3s' } }),
+      transition(':leave', [
+        animate('{{timing}}', style({ opacity: 0 }))
+      ], { params: { timing: '0.3s' } })
+    ]),
+    trigger('slideZoomIn', [
+      transition(':enter', [
+        animate('{{timing}} ease-out', keyframes([
+          style({ opacity: 0, transform: 'translateY({{translate}}) scale(0.95)', offset: 0 }),
+          style({ opacity: 1, transform: 'translateY(0) scale(1)', offset: 1 })
+        ]))
+      ], { params: { timing: '0.4s', translate: '-30px' } }),
+
+      transition(':leave', [
+        animate('{{timing}} ease-in', keyframes([
+          style({ opacity: 1, transform: 'translateY(0) scale(1)', offset: 0 }),
+          style({ opacity: 0, transform: 'translateY({{translate}}) scale(0.95)', offset: 1 })
+        ]))
+      ], { params: { timing: '0.4s', translate: '-30px' } })
+    ])
+  ],
+  templateUrl: './scope.component.html'
 })
 export class ScopesComponent implements OnInit {
-  scopes: any[] = [];
+  scopes: Scope[] = [];
   searchTerm = '';
   showModal = false;
 
-  newScope = {
-    name: '',
+  newScope: Partial<Scope> = {
+    scopeName: '',
     description: ''
   };
 
-  constructor(private http: HttpClient) {
-    this.loadScopes();
-  }
+  constructor(private scopesService: ScopesService) {}
 
   ngOnInit(): void {
     this.loadScopes();
   }
 
-  loadScopes() {
-    debugger;
-    const params = this.searchTerm
-      ? new HttpParams().set('search', this.searchTerm)
-      : undefined;
-
-    this.http.get<any[]>('http://localhost:8080/api/scopes', { params }).subscribe(scopes => {
-      this.scopes = scopes;
+  loadScopes(): void {
+    this.scopesService.getScopes(this.searchTerm).subscribe({
+      next: scopes => this.scopes = scopes,
+      error: err => console.error('Error loading scopes', err)
     });
   }
 
-  searchScopes() {
+  searchScopes(): void {
     this.loadScopes();
   }
 
-  openModal() {
-    this.newScope = { name: '', description: '' };
+  openModal(): void {
+    this.newScope = { scopeName: '', description: '' };
     this.showModal = true;
   }
 
-  closeModal() {
+  closeModal(): void {
     this.showModal = false;
   }
 
-  createScope() {
-    this.http.post('/api/scopes', this.newScope).subscribe(() => {
-      Swal.fire({
-        icon: 'success',
-        title: 'Scope created!',
-        showConfirmButton: false,
-        timer: 1500
-      });
-      this.closeModal();
-      this.loadScopes();
+  createScope(): void {
+    if (!this.newScope.scopeName || !this.newScope.description) return;
+
+    this.scopesService.createScope(this.newScope).subscribe({
+      next: () => {
+        Swal.fire({
+          icon: 'success',
+          title: 'Scope created!',
+          showConfirmButton: false,
+          timer: 1500
+        });
+        this.closeModal();
+        this.loadScopes();
+      },
+      error: err => {
+        Swal.fire({
+          icon: 'error',
+          title: 'Error creating scope',
+          text: err.message
+        });
+      }
     });
   }
 }
