@@ -20,6 +20,9 @@ import com.driagon.services.logging.utils.MaskedLogger;
 import lombok.RequiredArgsConstructor;
 import org.apache.commons.collections4.CollectionUtils;
 import org.springframework.dao.DataAccessException;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -81,7 +84,19 @@ public class ScopeServiceImpl implements IScopeService {
 
             if (exists) throw new BusinessException("Scope with name " + request.getScopeName() + " already exists.");
 
-            User user = this.userRepository.findAll().stream().findFirst().orElseThrow(() -> new NotFoundException("No user found."));
+            // Obtener el usuario autenticado del contexto de seguridad
+            Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+
+            String username;
+            if (authentication.getPrincipal() instanceof UserDetails) {
+                username = ((UserDetails) authentication.getPrincipal()).getUsername();
+            } else {
+                username = authentication.getName();
+            }
+
+            User user = this.userRepository.findByEmail(username)
+                    .orElseThrow(() -> new NotFoundException("Authenticated user not found in database"));
+
 
             Scope scope = this.mapper.mapCreateScopeRequestToScopeEntity(request);
             scope.setCreatedBy(user);
