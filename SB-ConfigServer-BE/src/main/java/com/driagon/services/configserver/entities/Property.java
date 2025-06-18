@@ -9,6 +9,7 @@ import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
+import jakarta.persistence.UniqueConstraint;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
@@ -29,7 +30,9 @@ import java.time.LocalDateTime;
 @ToString
 @Builder
 @Entity
-@Table(schema = "ISIS", name = "PROPERTIES")
+@Table(schema = "ISIS", name = "PROPERTIES", uniqueConstraints = {
+        @UniqueConstraint(columnNames = {"SCOPE_ID", "KEY"})
+})
 public class Property implements Serializable {
 
     @Serial
@@ -40,7 +43,7 @@ public class Property implements Serializable {
     @Column(name = "ID")
     private Long id;
 
-    @Column(name = "KEY", length = 100, nullable = false, unique = true)
+    @Column(name = "KEY", length = 100, nullable = false)
     private String key;
 
     @Column(name = "VALUE", columnDefinition = "TEXT")

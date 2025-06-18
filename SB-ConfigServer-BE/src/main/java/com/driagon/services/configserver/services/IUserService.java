@@ -1,5 +1,6 @@
 package com.driagon.services.configserver.services;
 
+import com.driagon.services.configserver.dto.requests.UpdatePasswordRequest;
 import com.driagon.services.configserver.dto.requests.UpdateUserRequest;
 import com.driagon.services.configserver.dto.requests.UserRequest;
 import com.driagon.services.configserver.dto.responses.UserResponse;
@@ -52,7 +53,7 @@ public interface IUserService {
      * Updates the password of a user.
      *
      * @param userId the ID of the user whose password is to be updated
-     * @param newPassword the new password to set for the user
+     * @param request the request containing the new password
      */
-    void updateUserPassword(Long userId, String newPassword);
+    void updateUserPassword(Long userId, UpdatePasswordRequest request);
 }

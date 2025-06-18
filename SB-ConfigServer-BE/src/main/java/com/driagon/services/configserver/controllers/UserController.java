@@ -1,5 +1,6 @@
 package com.driagon.services.configserver.controllers;
 
+import com.driagon.services.configserver.dto.requests.UpdatePasswordRequest;
 import com.driagon.services.configserver.dto.requests.UpdateUserRequest;
 import com.driagon.services.configserver.dto.requests.UserRequest;
 import com.driagon.services.configserver.dto.responses.UserResponse;
@@ -63,9 +64,9 @@ public class UserController {
     }
 
     @PutMapping("/{id}/password")
-    public ResponseEntity<Void> updateUserPassword(@PathVariable Long id, @RequestBody String newPassword) {
+    public ResponseEntity<Void> updateUserPassword(@PathVariable Long id, @RequestBody UpdatePasswordRequest request) {
         log.info("Updating password for user with id {}", id);
-        this.service.updateUserPassword(id, newPassword);
+        this.service.updateUserPassword(id, request);
         return ResponseEntity.noContent().build();
     }
 }

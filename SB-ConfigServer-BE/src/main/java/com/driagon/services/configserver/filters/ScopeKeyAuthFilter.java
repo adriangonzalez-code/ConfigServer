@@ -21,21 +21,8 @@ public class ScopeKeyAuthFilter extends OncePerRequestFilter {
 
     private final IScopeKeyAuthService scopeKeyAuthService;
 
-    /**
-     * Same contract as for {@code doFilter}, but guaranteed to be
-     * just invoked once per request within a single request thread.
-     * See {@link #shouldNotFilterAsyncDispatch()} for details.
-     * <p>Provides HttpServletRequest and HttpServletResponse arguments instead of the
-     * default ServletRequest and ServletResponse ones.
-     *
-     * @param request
-     * @param response
-     * @param filterChain
-     */
     @Override
-    protected void doFilterInternal(HttpServletRequest request,
-                                    HttpServletResponse response,
-                                    FilterChain filterChain)
+    protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain)
             throws ServletException, IOException {
 
         String scope = request.getHeader("X-CONFIG-SCOPE");
@@ -43,8 +30,7 @@ public class ScopeKeyAuthFilter extends OncePerRequestFilter {
 
         if (scope != null && accessKey != null) {
             if (scopeKeyAuthService.isValid(scope, accessKey)) {
-                UsernamePasswordAuthenticationToken auth =
-                        new UsernamePasswordAuthenticationToken(scope, null, List.of());
+                UsernamePasswordAuthenticationToken auth = new UsernamePasswordAuthenticationToken(scope, null, List.of());
                 SecurityContextHolder.getContext().setAuthentication(auth);
             } else {
                 response.sendError(HttpStatus.UNAUTHORIZED.value(), "Invalid scope or access key");

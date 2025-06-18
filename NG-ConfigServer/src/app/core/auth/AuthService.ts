@@ -4,6 +4,7 @@ import { tap } from "rxjs";
 
 @Injectable({ providedIn: 'root' })
 export class AuthService {
+
   private readonly TOKEN_KEY = 'auth_token';
 
   constructor(private http: HttpClient) {}
