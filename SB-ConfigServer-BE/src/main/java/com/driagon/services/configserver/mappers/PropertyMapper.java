@@ -35,9 +35,24 @@ public abstract class PropertyMapper {
     })
     public abstract SetPropertyResponse mapPropertyEntityToSetPropertyResponse(Property properties);
 
+    @Mappings({
+            @Mapping(target = "id", ignore = true),
+            @Mapping(target = "key", source = "key"),
+            @Mapping(target = "value", expression = "java(decryptValue(property.getValue(), property.isSecret()))"),
+            @Mapping(target = "secret", ignore = true)
+    })
+    public abstract SetPropertyResponse mapPropertyEntityToSetPropertyResponseWithDecryption(Property property);
+
     protected String processValue(String value, boolean isSecret) {
         if (isSecret && value != null && !value.trim().isEmpty()) {
             return encryptionUtil.encrypt(value);
+        }
+        return value;
+    }
+
+    protected String decryptValue(String value, boolean isSecret) {
+        if (isSecret && value != null && !value.trim().isEmpty()) {
+            return encryptionUtil.decrypt(value);
         }
         return value;
     }

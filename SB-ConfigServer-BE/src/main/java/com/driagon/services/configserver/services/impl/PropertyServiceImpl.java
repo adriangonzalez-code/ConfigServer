@@ -70,6 +70,34 @@ public class PropertyServiceImpl implements IPropertyService {
     }
 
     @Override
+    @Loggable(message = "Fetching all properties and decrypted secrets for scope: {0}", exceptions = {
+            @ExceptionLog(value = NotFoundException.class, message = "Scope not found: {0}"),
+            @ExceptionLog(value = ProcessException.class, message = "Error processing properties for scope: {0}")
+    })
+    @Transactional(readOnly = true)
+    public Set<SetPropertyResponse> getAllPropertiesAndSecretDecryptedByScopeNameAndAccessKey(String scopeName, String accessKey) {
+        try {
+
+            Long scopeId = this.scopeRepository.findIdByNameAndAccessKey(scopeName, accessKey)
+                    .orElseThrow(() -> new NotFoundException("Scope not found with name: " + scopeName + " and access key: " + accessKey));
+
+            Set<Property> properties = this.propertyRepository.findByScope_Id(scopeId);
+
+            if (CollectionUtils.isEmpty(properties)) {
+                log.info("No properties found for scope: {}", scopeId);
+                return Set.of();
+            }
+
+            return properties.stream()
+                    .map(this.mapper::mapPropertyEntityToSetPropertyResponseWithDecryption)
+                    .collect(Collectors.toSet());
+
+        } catch (DataAccessException ex) {
+            throw new ProcessException(ex.getMessage());
+        }
+    }
+
+    @Override
     @Loggable(message = "Setting properties for scope: {0}", exceptions = {
             @ExceptionLog(value = NotFoundException.class, message = "Scope not found: {0}"),
             @ExceptionLog(value = ProcessException.class, message = "Error processing properties for scope: {0}")
