@@ -30,7 +30,7 @@ public abstract class PropertyMapper {
     @Mappings({
             @Mapping(target = "id", source = "id"),
             @Mapping(target = "key", source = "key"),
-            @Mapping(target = "value", expression = "java(processValueForResponse(properties.getValue(), properties.isSecret()))"),
+            @Mapping(target = "value", source = "value"),
             @Mapping(target = "secret", source = "secret")
     })
     public abstract SetPropertyResponse mapPropertyEntityToSetPropertyResponse(Property properties);
@@ -38,13 +38,6 @@ public abstract class PropertyMapper {
     protected String processValue(String value, boolean isSecret) {
         if (isSecret && value != null && !value.trim().isEmpty()) {
             return encryptionUtil.encrypt(value);
-        }
-        return value;
-    }
-
-    protected String processValueForResponse(String value, boolean isSecret) {
-        if (isSecret && value != null && !value.trim().isEmpty()) {
-            return encryptionUtil.decrypt(value);
         }
         return value;
     }

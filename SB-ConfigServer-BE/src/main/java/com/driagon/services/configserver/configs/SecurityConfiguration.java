@@ -58,6 +58,9 @@ public class SecurityConfiguration {
                         // Rutas públicas (autenticación)
                         .requestMatchers("/api/auth/**").permitAll()
 
+                        // Rutas POST - acceso solo para ADMIN
+                        .requestMatchers(HttpMethod.GET, "/api/scopes/*/access-key").hasRole("ADMIN")
+
                         // Rutas GET - acceso para ADMIN y USER
                         .requestMatchers(HttpMethod.GET, "/api/users/**").hasAnyRole("ADMIN", "USER")
                         .requestMatchers(HttpMethod.GET, "/api/scopes/**").hasAnyRole("ADMIN", "USER")
@@ -99,7 +102,7 @@ public class SecurityConfiguration {
     @Bean
     public CorsConfigurationSource corsConfigurationSource() {
         CorsConfiguration configuration = new CorsConfiguration();
-        configuration.setAllowedOrigins(List.of("http://localhost:4200"));
+        configuration.setAllowedOrigins(List.of("http://localhost:4200", "http://localhost:61483/"));
         configuration.setAllowedMethods(List.of(Arrays.stream(HttpMethod.values()).map(HttpMethod::name).toArray(String[]::new)));
         configuration.setAllowedHeaders(List.of("*"));
         configuration.setAllowCredentials(true);

@@ -16,6 +16,7 @@ import com.driagon.services.logging.annotations.Loggable;
 import com.driagon.services.logging.utils.MaskedLogger;
 import lombok.RequiredArgsConstructor;
 import org.apache.commons.collections4.CollectionUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.dao.DataAccessException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -74,16 +75,20 @@ public class PropertyServiceImpl implements IPropertyService {
             @ExceptionLog(value = ProcessException.class, message = "Error processing properties for scope: {0}")
     })
     @Transactional
-    public Set<SetPropertyResponse> setProperties(Long scopeRequest, Set<SetPropertyRequest> request) {
+    public Set<SetPropertyResponse> setProperties(Long scopeId, Set<SetPropertyRequest> request) {
         try {
-            if (!this.scopeRepository.existsById(scopeRequest)) {
-                throw new NotFoundException("Scope not found: " + scopeRequest);
+            if (!this.scopeRepository.existsById(scopeId)) {
+                throw new NotFoundException("Scope not found: " + scopeId);
             }
+
+            request = request.stream()
+                    .filter(req -> StringUtils.isNotBlank(req.getKey()) && StringUtils.isNotBlank(req.getValue()))
+                    .collect(Collectors.toSet());
 
             User user = this.userRepository.findAll().stream().findFirst()
                     .orElseThrow(() -> new NotFoundException("No user found."));
 
-            Set<Property> existingProperties = this.propertyRepository.findByScope_Id(scopeRequest);
+            Set<Property> existingProperties = this.propertyRepository.findByScope_Id(scopeId);
 
             Set<Long> requestPropertyIds = new HashSet<>();
             Set<String> requestPropertyKeys = new HashSet<>();
@@ -103,7 +108,7 @@ public class PropertyServiceImpl implements IPropertyService {
                             !requestPropertyKeys.contains(property.getKey()))
                     .collect(Collectors.toSet());
 
-            log.info("Found {} properties for scope {} to be deleted", propsToBeDeleted.size(), scopeRequest);
+            log.info("Found {} properties for scope {} to be deleted", propsToBeDeleted.size(), scopeId);
 
             if (CollectionUtils.isNotEmpty(propsToBeDeleted)) {
                 this.propertyRepository.deleteAll(propsToBeDeleted);
@@ -113,7 +118,7 @@ public class PropertyServiceImpl implements IPropertyService {
 
             log.debug("Using batch query for {} keys without ID", requestKeysWithoutId.size());
             List<Property> existingPropsForKeys = this.propertyRepository
-                    .findByScopeIdAndKeyIn(scopeRequest, requestKeysWithoutId);
+                    .findByScopeIdAndKeyIn(scopeId, requestKeysWithoutId);
 
             existingPropsByKey = existingPropsForKeys.stream()
                     .collect(Collectors.toMap(Property::getKey, Function.identity()));
@@ -122,27 +127,27 @@ public class PropertyServiceImpl implements IPropertyService {
 
             for (SetPropertyRequest propertyRequest : request) {
                 Property propertyToSave;
+                Long incomingId = propertyRequest.getId();
+                boolean existsInDb = incomingId != null && this.propertyRepository.existsByIdAndScope_Id(incomingId, scopeId);
 
-                if (propertyRequest.getId() != null) {
+                if (existsInDb) {
                     propertyToSave = this.mapper.mapRequestToProperty(propertyRequest);
-                    log.debug("Updating property with provided ID: {} and key: {}",
-                            propertyRequest.getId(), propertyRequest.getKey());
-
+                    log.debug("Updating property with provided ID: {} and key: {}", incomingId, propertyRequest.getKey());
                 } else {
                     Property existingProperty = existingPropsByKey.get(propertyRequest.getKey());
 
+                    propertyToSave = this.mapper.mapRequestToProperty(propertyRequest);
+
                     if (existingProperty != null) {
-                        propertyToSave = this.mapper.mapRequestToProperty(propertyRequest);
                         propertyToSave.setId(existingProperty.getId());
-                        log.debug("Updating property with existing key: {} using ID: {}",
-                                propertyRequest.getKey(), existingProperty.getId());
+                        log.debug("Updating property with existing key: {} using ID: {}", propertyRequest.getKey(), existingProperty.getId());
                     } else {
-                        propertyToSave = this.mapper.mapRequestToProperty(propertyRequest);
                         log.debug("Creating new property with key: {}", propertyRequest.getKey());
+                        propertyToSave.setId(null); // asegurarse de que sea tratado como nuevo
                     }
                 }
 
-                propertyToSave.setScope(this.scopeRepository.getReferenceById(scopeRequest));
+                propertyToSave.setScope(this.scopeRepository.getReferenceById(scopeId));
                 propertyToSave.setCreatedBy(user);
 
                 propertiesToSave.add(propertyToSave);

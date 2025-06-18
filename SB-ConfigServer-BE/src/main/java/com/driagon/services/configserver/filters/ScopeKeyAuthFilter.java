@@ -33,9 +33,7 @@ public class ScopeKeyAuthFilter extends OncePerRequestFilter {
      * @param filterChain
      */
     @Override
-    protected void doFilterInternal(HttpServletRequest request,
-                                    HttpServletResponse response,
-                                    FilterChain filterChain)
+    protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain)
             throws ServletException, IOException {
 
         String scope = request.getHeader("X-CONFIG-SCOPE");
@@ -43,8 +41,7 @@ public class ScopeKeyAuthFilter extends OncePerRequestFilter {
 
         if (scope != null && accessKey != null) {
             if (scopeKeyAuthService.isValid(scope, accessKey)) {
-                UsernamePasswordAuthenticationToken auth =
-                        new UsernamePasswordAuthenticationToken(scope, null, List.of());
+                UsernamePasswordAuthenticationToken auth = new UsernamePasswordAuthenticationToken(scope, null, List.of());
                 SecurityContextHolder.getContext().setAuthentication(auth);
             } else {
                 response.sendError(HttpStatus.UNAUTHORIZED.value(), "Invalid scope or access key");

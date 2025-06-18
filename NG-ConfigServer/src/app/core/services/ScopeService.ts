@@ -2,6 +2,7 @@ import { Injectable } from '@angular/core';
 import { HttpClient, HttpParams } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import {Scope} from "../../features/scopes/models/scope.model";
+import {AccessKey} from "../../features/scope-details/models/access-key.model";
 
 @Injectable({
   providedIn: 'root'
@@ -26,5 +27,13 @@ export class ScopesService {
 
   getScopeById(id: number): Observable<Scope> {
     return this.http.get<Scope>(`${this.apiUrl}/${id}`);
+  }
+
+  getAccessKeyById(id: number): Observable<AccessKey> {
+    return this.http.get<AccessKey>(`${this.apiUrl}/${id}/access-key`);
+  }
+
+  setUsersToScope(scopeId: number, emails: String[]): Observable<void> {
+    return this.http.put<void>(`${this.apiUrl}/${scopeId}/users`, emails);
   }
 }

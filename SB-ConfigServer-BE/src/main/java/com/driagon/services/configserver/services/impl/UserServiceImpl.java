@@ -1,5 +1,6 @@
 package com.driagon.services.configserver.services.impl;
 
+import com.driagon.services.configserver.dto.requests.UpdatePasswordRequest;
 import com.driagon.services.configserver.dto.requests.UpdateUserRequest;
 import com.driagon.services.configserver.dto.requests.UserRequest;
 import com.driagon.services.configserver.dto.responses.UserResponse;
@@ -204,13 +205,14 @@ public class UserServiceImpl implements IUserService {
                     printStackTrace = true
             )
     })
-    public void updateUserPassword(Long userId, String newPassword) {
+    @Transactional
+    public void updateUserPassword(Long userId, UpdatePasswordRequest request) {
         try {
-            var user = this.repository.findById(userId)
-                    .orElseThrow(() -> new NotFoundException("User with ID " + userId + " not found."));
+            var user = this.repository.findById(userId).orElseThrow(() -> new NotFoundException("User with ID " + userId + " not found."));
 
-            log.info("Encrypting new password for user {}", user.getEmail());
-            user.setPassword(this.encryptor.encode(newPassword));
+            String encodedPassword = this.encryptor.encode(request.getNewPassword());
+
+            user.setPassword(encodedPassword);
             this.repository.save(user);
         } catch (DataAccessException e) {
             throw new ProcessException("An error occurred while accessing the database.");

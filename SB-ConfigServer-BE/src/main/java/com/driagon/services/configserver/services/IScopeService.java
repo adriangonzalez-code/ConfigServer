@@ -1,6 +1,7 @@
 package com.driagon.services.configserver.services;
 
 import com.driagon.services.configserver.dto.requests.CreateScopeRequest;
+import com.driagon.services.configserver.dto.responses.AccessKeyResponse;
 import com.driagon.services.configserver.dto.responses.CreateScopeResponse;
 import com.driagon.services.configserver.dto.responses.ScopeResponse;
 
@@ -15,4 +16,6 @@ public interface IScopeService {
     CreateScopeResponse createScope(CreateScopeRequest request);
 
     boolean setUsersToScope(Long scopeId, Set<String> emails);
+
+    AccessKeyResponse getAccessKey(Long scopeId);
 }

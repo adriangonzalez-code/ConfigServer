@@ -15,4 +15,8 @@ export class PropertyService {
   getProperties(scopeId: number): Observable<Property[]> {
     return this.http.get<Property[]>(`${this.apiUrl}/${scopeId}/scope`);
   }
+
+  createProperty(scopeId: number, property: Property[]): Observable<Property[]> {
+    return this.http.put<Property[]>(`${this.apiUrl}/${scopeId}/scope`, property);
+  }
 }

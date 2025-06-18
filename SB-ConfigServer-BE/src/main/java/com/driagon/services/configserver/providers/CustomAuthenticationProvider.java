@@ -22,6 +22,12 @@ public class CustomAuthenticationProvider implements AuthenticationProvider {
 
         UserDetails user = userDetailsService.loadUserByUsername(username);
 
+        // Agregar log para depuración
+        System.out.println("Raw password: " + rawPassword);
+        System.out.println("Encoded password from DB: " + user.getPassword());
+        System.out.println("Encoded password: " + passwordEncoder.encode(rawPassword));
+        System.out.println("Matches result: " + passwordEncoder.matches(rawPassword, user.getPassword()));
+
         if (!passwordEncoder.matches(rawPassword, user.getPassword())) {
             throw new BadCredentialsException("Invalid credentials");
         }

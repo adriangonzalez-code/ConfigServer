@@ -1,11 +1,16 @@
+
 import { ActivatedRoute } from '@angular/router';
-import { Component } from "@angular/core";
+import { Component, TrackByFunction } from "@angular/core";
 import { Scope } from "../scopes/models/scope.model";
 import { ScopesService } from "../../core/services/ScopeService";
 import {NgClass, NgForOf, NgIf} from "@angular/common";
 import { PropertyService } from "../../core/services/PropertyService";
 import {FormsModule} from "@angular/forms";
 import {Property} from "./models/property.model";
+import {AccessKey} from "./models/access-key.model";
+import swal from 'sweetalert2';
+import {UserService} from "../../core/services/UserService";
+import {User} from "./models/user-model";
 
 @Component({
   selector: 'app-scope-details',
@@ -20,13 +25,12 @@ import {Property} from "./models/property.model";
 })
 export class ScopeDetailsComponent {
 
-  activeTab: 'plain' | 'secret' | 'users' | 'access' = 'plain';
+  activeTab: 'plain' | 'secret' | 'users' | 'information' = 'plain';
   editMode: boolean = false;
   scopeId: number = 0;
-  properties: any[] = [];
-  showSecrets: Record<number, boolean> = {};
-  showAccessKey: boolean = false;
-  accessKey: string = ''; // asigna desde el backend o como corresponda
+  properties: Property[] = [];
+  accessKey: string = '';
+  users: User[] = [];
   scopeDetails: Scope = {
     id: 0,
     scopeName: '',
@@ -37,7 +41,7 @@ export class ScopeDetailsComponent {
     users: []
   };
 
-  constructor(private route: ActivatedRoute, private scopesService: ScopesService, private propertyService: PropertyService) {}
+  constructor(private route: ActivatedRoute, private scopesService: ScopesService, private propertyService: PropertyService, private userService: UserService) {}
 
   ngOnInit() {
     this.route.paramMap.subscribe(params => {
@@ -45,6 +49,7 @@ export class ScopeDetailsComponent {
       if (id) {
         this.scopeId = +id;
         this.loadScopeDetails(this.scopeId);
+        this.getUsers();
       }
     });
   }
@@ -55,6 +60,7 @@ export class ScopeDetailsComponent {
         this.scopeDetails = scope;
 
         this.loadProperties(id);
+        this.getAccessKey(id);
       },
       error: (err) => {
         console.error('Error loading scope details:', err);
@@ -74,12 +80,24 @@ export class ScopeDetailsComponent {
   }
 
   getFilteredProperties(tab: 'plain' | 'secret') {
+    // Verificación de null/undefined para evitar errores
+    if (!this.properties || !Array.isArray(this.properties)) {
+      return [];
+    }
     return this.properties.filter(p => p.secret === (tab === 'secret'));
   }
 
   addProperty(tab: 'plain' | 'secret') {
+    // Asegurar que properties existe antes de hacer push
+    if (!this.properties || !Array.isArray(this.properties)) {
+      this.properties = [];
+    }
+
+    // Generar un ID único temporal para el nuevo elemento
+    const tempId = Math.max(0, ...this.properties.map(p => p.id)) + 1;
+
     this.properties.push({
-      id: 0,
+      id: tempId,
       key: '',
       value: '',
       secret: tab === 'secret'
@@ -102,14 +120,93 @@ export class ScopeDetailsComponent {
     this.scopeDetails.users.splice(index, 1);
   }
 
-  toggleSecretVisibility(propId: number): void {
-    this.showSecrets[propId] = !this.showSecrets[propId];
+  getAccessKey(id: number) {
+    this.scopesService.getAccessKeyById(id).subscribe({
+      next: (res: AccessKey) => {
+        if (res) {
+          this.accessKey = res.accessKey;
+        } else {
+          this.accessKey = '';
+        }
+      },
+      error: (err) => {
+        this.accessKey = '';
+      }
+    });
   }
 
-  saveUsers() {
-    // Aquí haces el llamado al servicio
-    /*this.scopeService.updateUsers(this.scopeId, this.users).subscribe(() => {
-      Swal.fire('Saved!', 'User list updated.', 'success');
-    });*/
+  saveProperties(scopeId: number) {
+    this.propertyService.createProperty(scopeId, this.properties).subscribe({
+      next: (properties) => {
+        console.log('Properties saved successfully:', properties);
+        this.loadProperties(scopeId);
+        this.toggleEditMode();
+
+        swal.fire({
+          title: 'Success',
+          text: 'Properties saved successfully!',
+          icon: 'success',
+          confirmButtonText: 'OK'
+        });
+      },
+      error: (err) => {
+        console.error('Error saving properties:', err);
+      }
+    });
+  }
+
+  trackByPropertyId(index: number, item: Property): any {
+    return item.id;
+  }
+
+  // Función trackBy para los usuarios - corregida
+  trackByUserIndex: TrackByFunction<string> = (index: number, item: string) => {
+    return index;
+  }
+
+  getUsers() {
+    this.userService.getUsers().subscribe({
+      next: (users) => {
+        this.users = users;
+        console.log('Users fetched successfully:', this.users);
+      },
+      error: (err) => {
+        console.error('Error fetching users:', err);
+      }
+    });
+  }
+
+  setUsersToScope(scopeId: number) {
+    const emails = this.scopeDetails.users.filter(email => email.trim() !== '');
+    if (emails.length === 0) {
+      swal.fire({
+        title: 'Error',
+        text: 'Please add at least one user email.',
+        icon: 'error',
+        confirmButtonText: 'OK'
+      });
+      return;
+    }
+
+    this.scopesService.setUsersToScope(scopeId, emails).subscribe({
+      next: () => {
+        swal.fire({
+          title: 'Success',
+          text: 'Users added to scope successfully!',
+          icon: 'success',
+          confirmButtonText: 'OK'
+        });
+        this.loadScopeDetails(scopeId);
+      },
+      error: (err) => {
+        console.error('Error setting users to scope:', err);
+        swal.fire({
+          title: 'Error',
+          text: 'Failed to add users to scope.',
+          icon: 'error',
+          confirmButtonText: 'OK'
+        });
+      }
+    });
   }
 }
