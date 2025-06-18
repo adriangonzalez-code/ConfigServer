@@ -9,5 +9,7 @@ public interface IPropertyService {
 
     Set<SetPropertyResponse> getAllPropertiesByScope(Long scopeId);
 
+    Set<SetPropertyResponse> getAllPropertiesAndSecretDecryptedByScopeNameAndAccessKey(String scopeName, String accessKey);
+
     Set<SetPropertyResponse> setProperties(Long scopeRequest, Set<SetPropertyRequest> request);
 }

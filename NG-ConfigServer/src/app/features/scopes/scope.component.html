@@ -16,9 +16,9 @@
     </button>
   </div>
 
-  <table class="min-w-full border-collapse rounded-md overflow-hidden shadow-md">
+  <table class="min-w-full rounded-md overflow-hidden shadow-md border-collapse">
     <thead class="bg-gray-200 text-gray-700">
-    <tr>
+    <tr class="border-b border-gray-200">
       <th class="text-left px-4 py-2">Name</th>
       <th class="text-left px-4 py-2">Description</th>
       <th class="text-left px-4 py-2">Created By</th>
@@ -26,7 +26,7 @@
     </tr>
     </thead>
     <tbody>
-    <tr *ngFor="let scope of scopes" class="hover:bg-gray-100 transition duration-200" [routerLink]="['/scopes', scope.id]">
+    <tr *ngFor="let scope of scopes" class="hover:bg-gray-200 transition duration-200 border-b border-gray-200" [routerLink]="['/scopes', scope.id]">
       <td class="px-4 py-2">{{ scope.scopeName }}</td>
       <td class="px-4 py-2">{{ scope.description }}</td>
       <td class="px-4 py-2">{{ scope.createdBy }}</td>

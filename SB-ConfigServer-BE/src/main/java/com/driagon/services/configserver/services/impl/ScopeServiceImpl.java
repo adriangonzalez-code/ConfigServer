@@ -2,6 +2,7 @@ package com.driagon.services.configserver.services.impl;
 
 import com.driagon.services.configserver.dto.requests.CreateScopeRequest;
 import com.driagon.services.configserver.dto.requests.SetPropertyRequest;
+import com.driagon.services.configserver.dto.responses.AccessKeyResponse;
 import com.driagon.services.configserver.dto.responses.CreateScopeResponse;
 import com.driagon.services.configserver.dto.responses.ScopeResponse;
 import com.driagon.services.configserver.entities.Property;
@@ -100,6 +101,7 @@ public class ScopeServiceImpl implements IScopeService {
 
             Scope scope = this.mapper.mapCreateScopeRequestToScopeEntity(request);
             scope.setCreatedBy(user);
+            scope.setUsers(List.of(user));
 
             scope = this.scopeRepository.save(scope);
 
@@ -138,6 +140,27 @@ public class ScopeServiceImpl implements IScopeService {
             return true;
         } catch (DataAccessException ex) {
             throw new ProcessException("Error while updating users for scope: " + ex.getMessage());
+        }
+    }
+
+    @Override
+    @Loggable
+    @Transactional(readOnly = true)
+    public AccessKeyResponse getAccessKey(Long scopeId) {
+        try {
+            Scope scope = this.scopeRepository.findById(scopeId)
+                    .orElseThrow(() -> new NotFoundException("Scope with ID " + scopeId + " not found."));
+
+            boolean hasPermission = scope.getUsers().stream().anyMatch(user -> user.getEmail().equals(SecurityContextHolder.getContext().getAuthentication().getName())) ||
+                    scope.getCreatedBy().getEmail().equals(SecurityContextHolder.getContext().getAuthentication().getName());
+
+            if (!hasPermission) return null;
+
+            return AccessKeyResponse.builder()
+                    .accessKey(scope.getAccessKey())
+                    .build();
+        } catch (DataAccessException ex) {
+            return null;
         }
     }
 }

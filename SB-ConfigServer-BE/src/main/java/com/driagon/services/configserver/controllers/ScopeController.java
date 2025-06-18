@@ -2,6 +2,7 @@ package com.driagon.services.configserver.controllers;
 
 import com.driagon.services.configserver.constants.ValidationMessages;
 import com.driagon.services.configserver.dto.requests.CreateScopeRequest;
+import com.driagon.services.configserver.dto.responses.AccessKeyResponse;
 import com.driagon.services.configserver.dto.responses.CreateScopeResponse;
 import com.driagon.services.configserver.dto.responses.ScopeResponse;
 import com.driagon.services.configserver.services.IScopeService;
@@ -52,6 +53,16 @@ public class ScopeController {
             String id) {
         ScopeResponse scope = this.scopeService.getScopeById(Long.valueOf(id));
         return ResponseEntity.ok(scope);
+    }
+
+    @GetMapping("/{id}/access-key")
+    public ResponseEntity<AccessKeyResponse> getAccessKey(@PathVariable String id) {
+        AccessKeyResponse accessKey = this.scopeService.getAccessKey(Long.valueOf(id));
+        if (accessKey == null) {
+            return ResponseEntity.noContent().build();
+        }
+
+        return ResponseEntity.ok(accessKey);
     }
 
     @PostMapping

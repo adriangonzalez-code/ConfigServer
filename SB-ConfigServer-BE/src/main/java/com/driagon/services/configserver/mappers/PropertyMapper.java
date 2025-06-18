@@ -30,10 +30,18 @@ public abstract class PropertyMapper {
     @Mappings({
             @Mapping(target = "id", source = "id"),
             @Mapping(target = "key", source = "key"),
-            @Mapping(target = "value", expression = "java(processValueForResponse(properties.getValue(), properties.isSecret()))"),
+            @Mapping(target = "value", source = "value"),
             @Mapping(target = "secret", source = "secret")
     })
     public abstract SetPropertyResponse mapPropertyEntityToSetPropertyResponse(Property properties);
+
+    @Mappings({
+            @Mapping(target = "id", ignore = true),
+            @Mapping(target = "key", source = "key"),
+            @Mapping(target = "value", expression = "java(decryptValue(property.getValue(), property.isSecret()))"),
+            @Mapping(target = "secret", ignore = true)
+    })
+    public abstract SetPropertyResponse mapPropertyEntityToSetPropertyResponseWithDecryption(Property property);
 
     protected String processValue(String value, boolean isSecret) {
         if (isSecret && value != null && !value.trim().isEmpty()) {
@@ -42,7 +50,7 @@ public abstract class PropertyMapper {
         return value;
     }
 
-    protected String processValueForResponse(String value, boolean isSecret) {
+    protected String decryptValue(String value, boolean isSecret) {
         if (isSecret && value != null && !value.trim().isEmpty()) {
             return encryptionUtil.decrypt(value);
         }
