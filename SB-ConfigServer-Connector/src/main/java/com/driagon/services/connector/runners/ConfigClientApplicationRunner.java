@@ -18,10 +18,9 @@ public class ConfigClientApplicationRunner implements ApplicationRunner, Ordered
     }
 
     @Override
-    public void run(ApplicationArguments args) throws Exception {
+    public void run(ApplicationArguments args) {
         log.info("🚀 [config-driver] Config Client iniciado correctamente");
 
-        // Verificar que las propiedades se cargaron
         boolean hasConfigProperties = environment.getPropertySources()
                 .stream()
                 .anyMatch(ps -> ps.getName().equals("config-server-properties"));
@@ -29,7 +28,6 @@ public class ConfigClientApplicationRunner implements ApplicationRunner, Ordered
         if (hasConfigProperties) {
             log.info("✅ [config-driver] Propiedades del config-server detectadas y disponibles");
 
-            // Opcional: mostrar algunas propiedades cargadas (sin valores sensibles)
             String url = environment.getProperty("config.url");
             String scope = environment.getProperty("config.scope");
             log.info("📡 [config-driver] Configuración activa - URL: {}, Scope: {}", url, scope);

@@ -8,6 +8,7 @@ import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Component;
 import org.springframework.web.filter.OncePerRequestFilter;
@@ -25,12 +26,12 @@ public class ScopeKeyAuthFilter extends OncePerRequestFilter {
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain)
             throws ServletException, IOException {
 
-        String scope = request.getHeader("X-CONFIG-SCOPE");
-        String accessKey = request.getHeader("X-CONFIG-KEY");
+        String scope = request.getHeader("X-Scope-Name");
+        String accessKey = request.getHeader("X-Scope-Access-Key");
 
         if (scope != null && accessKey != null) {
             if (scopeKeyAuthService.isValid(scope, accessKey)) {
-                UsernamePasswordAuthenticationToken auth = new UsernamePasswordAuthenticationToken(scope, null, List.of());
+                UsernamePasswordAuthenticationToken auth = new UsernamePasswordAuthenticationToken(scope, null, List.of(new SimpleGrantedAuthority("ROLE_SCOPE_KEY_AUTH")));
                 SecurityContextHolder.getContext().setAuthentication(auth);
             } else {
                 response.sendError(HttpStatus.UNAUTHORIZED.value(), "Invalid scope or access key");

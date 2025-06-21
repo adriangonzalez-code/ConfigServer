@@ -16,7 +16,6 @@ public class ConfigClientEventListener implements ApplicationListener<Applicatio
 
         log.info("🎉 [config-driver] Aplicación completamente lista - verificando configuración");
 
-        // Tu lógica post-startup aquí
         String url = environment.getProperty("config.url");
         String scope = environment.getProperty("config.scope");
 

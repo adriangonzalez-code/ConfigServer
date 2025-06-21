@@ -10,12 +10,11 @@ import org.springframework.core.env.ConfigurableEnvironment;
 import org.springframework.core.env.MapPropertySource;
 
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 public class ConfigClientEnvironmentPostProcessor implements EnvironmentPostProcessor, Ordered {
 
-    // Solo System.out para logs críticos pre-banner
     private static final String LOG_PREFIX = "[CONFIG-DRIVER-EARLY] ";
 
     @Override
@@ -25,13 +24,12 @@ public class ConfigClientEnvironmentPostProcessor implements EnvironmentPostProc
         String accessKey = environment.getProperty("config.key");
 
         if (scope == null || accessKey == null || url == null) {
-            // Solo logs mínimos pre-banner
             return;
         }
 
         try {
             System.out.println(LOG_PREFIX + "Cargando propiedades iniciales...");
-            List<PropertyResponse> properties = new ConfigPropertiesClient().fetchProperties(url, scope, accessKey);
+            Set<PropertyResponse> properties = new ConfigPropertiesClient().fetchProperties(url, scope, accessKey);
 
             Map<String, Object> props = new HashMap<>();
             for (PropertyResponse prop : properties) {
