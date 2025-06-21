@@ -3,6 +3,7 @@ package com.driagon.services.configserver.services.impl;
 import com.driagon.services.configserver.dto.requests.SetPropertyRequest;
 import com.driagon.services.configserver.dto.responses.SetPropertyResponse;
 import com.driagon.services.configserver.entities.Property;
+import com.driagon.services.configserver.entities.Scope;
 import com.driagon.services.configserver.entities.User;
 import com.driagon.services.configserver.mappers.PropertyMapper;
 import com.driagon.services.configserver.repositories.IPropertyRepository;
@@ -78,13 +79,13 @@ public class PropertyServiceImpl implements IPropertyService {
     public Set<SetPropertyResponse> getAllPropertiesAndSecretDecryptedByScopeNameAndAccessKey(String scopeName, String accessKey) {
         try {
 
-            Long scopeId = this.scopeRepository.findIdByNameAndAccessKey(scopeName, accessKey)
+            Scope scope = this.scopeRepository.findIdByNameAndAccessKey(scopeName, accessKey)
                     .orElseThrow(() -> new NotFoundException("Scope not found with name: " + scopeName + " and access key: " + accessKey));
 
-            Set<Property> properties = this.propertyRepository.findByScope_Id(scopeId);
+            Set<Property> properties = this.propertyRepository.findByScope_Id(scope.getId());
 
             if (CollectionUtils.isEmpty(properties)) {
-                log.info("No properties found for scope: {}", scopeId);
+                log.info("No properties found for scope: {}", scope.getName() + " (" + scope.getId() + ")");
                 return Set.of();
             }
 

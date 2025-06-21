@@ -1,8 +1,21 @@
 package com.driagon.services.connector.models.responses;
 
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
+import lombok.ToString;
+
 import java.io.Serial;
 import java.io.Serializable;
 
+@Getter
+@Setter
+@NoArgsConstructor
+@AllArgsConstructor
+@Builder
+@ToString
 public class PropertyResponse implements Serializable {
 
     @Serial
@@ -10,38 +23,4 @@ public class PropertyResponse implements Serializable {
 
     private String key;
     private String value;
-    private boolean secret;
-
-    public PropertyResponse() {
-    }
-
-    public PropertyResponse(String key, String value, boolean secret) {
-        this.key = key;
-        this.value = value;
-        this.secret = secret;
-    }
-
-    public String getKey() {
-        return key;
-    }
-
-    public void setKey(String key) {
-        this.key = key;
-    }
-
-    public String getValue() {
-        return value;
-    }
-
-    public void setValue(String value) {
-        this.value = value;
-    }
-
-    public boolean isSecret() {
-        return secret;
-    }
-
-    public void setSecret(boolean secret) {
-        this.secret = secret;
-    }
 }
