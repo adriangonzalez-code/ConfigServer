@@ -11,7 +11,7 @@ public class EncryptionUtil {
     private final StringEncryptor stringEncryptor;
 
     public String encrypt(String plainText) {
-        if (plainText == null || plainText.trim().isEmpty()) {
+        if (plainText == null || plainText.trim().isEmpty() || isEncrypted(plainText)) {
             return plainText;
         }
         return stringEncryptor.encrypt(plainText);
@@ -25,6 +25,19 @@ public class EncryptionUtil {
             return stringEncryptor.decrypt(encryptedText);
         } catch (Exception e) {
             return encryptedText;
+        }
+    }
+
+    public boolean isEncrypted(String text) {
+        if (text == null || text.trim().isEmpty()) {
+            return false;
+        }
+
+        try {
+            stringEncryptor.decrypt(text);
+            return true;
+        } catch (Exception e) {
+            return false;
         }
     }
 }
