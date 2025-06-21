@@ -13,5 +13,5 @@ public interface IScopeRepository extends JpaRepository<Scope, Long> {
 
     boolean existsScopeByNameAndAccessKey(String scopeName, String accessKey);
 
-    Optional<Long> findIdByNameAndAccessKey(String scopeName, String accessKey);
+    Optional<Scope> findIdByNameAndAccessKey(String scopeName, String accessKey);
 }

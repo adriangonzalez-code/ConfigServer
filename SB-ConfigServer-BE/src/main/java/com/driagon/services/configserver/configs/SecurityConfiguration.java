@@ -57,7 +57,6 @@ public class SecurityConfiguration {
                 .authorizeHttpRequests(auth -> auth
                         // Rutas públicas (autenticación)
                         .requestMatchers("/api/auth/**").permitAll()
-                        .requestMatchers(HttpMethod.POST,"/api/driver/properties").permitAll()
 
                         // Rutas POST - acceso solo para ADMIN
                         .requestMatchers(HttpMethod.GET, "/api/scopes/*/access-key").hasRole("ADMIN")
@@ -67,7 +66,9 @@ public class SecurityConfiguration {
                         .requestMatchers(HttpMethod.GET, "/api/scopes/**").hasAnyRole("ADMIN", "USER")
                         .requestMatchers(HttpMethod.GET, "/api/properties/**").hasAnyRole("ADMIN", "USER")
                         .requestMatchers(HttpMethod.GET, "/api/ui/**").hasAnyRole("ADMIN", "USER")
-                        .requestMatchers(HttpMethod.GET, "/api/driver/**").hasAnyRole("ADMIN", "USER")
+
+                        // Ruta POST - acceso para SCOPE_KEY_AUTH
+                        .requestMatchers(HttpMethod.POST,"/api/driver/properties").hasRole("SCOPE_KEY_AUTH")
 
                         // Rutas POST, PUT, DELETE - solo ADMIN
                         .requestMatchers(HttpMethod.POST, "/api/users/**").hasRole("ADMIN")

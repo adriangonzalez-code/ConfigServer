@@ -1,34 +1,39 @@
 package com.driagon.services.connector.clients;
 
 import com.driagon.services.connector.models.responses.PropertyResponse;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.client.RestTemplate;
 
-import java.util.Arrays;
-import java.util.List;
-import java.util.Objects;
+import java.util.Set;
 
 public class ConfigPropertiesClient {
 
+    private final static Logger log = LoggerFactory.getLogger(ConfigPropertiesClient.class);
+
     private final RestTemplate restTemplate = new RestTemplate();
 
-    public List<PropertyResponse> fetchProperties(String url, String scope, String accessKey) {
+    public Set<PropertyResponse> fetchProperties(String url, String scope, String accessKey) {
+        log.info("Fetching properties from URL: {} ", url);
+
         HttpHeaders headers = new HttpHeaders();
-        headers.set("X-CONFIG-SCOPE", scope);
-        headers.set("X-CONFIG-KEY", accessKey);
+        headers.set("X-Scope-Name", scope);
+        headers.set("X-Scope-Access-Key", accessKey);
 
         HttpEntity<Void> entity = new HttpEntity<>(headers);
 
-        ResponseEntity<PropertyResponse[]> response = restTemplate.exchange(
+        ResponseEntity<Set<PropertyResponse>> response = restTemplate.exchange(
                 url,
-                HttpMethod.GET,
+                HttpMethod.POST,
                 entity,
-                PropertyResponse[].class
+                new ParameterizedTypeReference<>() {}
         );
 
-        return Arrays.asList(Objects.requireNonNull(response.getBody()));
+        return response.getBody();
     }
 }
