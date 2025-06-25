@@ -71,7 +71,7 @@ public class SecurityConfiguration {
                         .requestMatchers(HttpMethod.POST,"/api/driver/properties").hasRole("SCOPE_KEY_AUTH")
 
                         // Rutas POST, PUT, DELETE - solo ADMIN
-                        .requestMatchers(HttpMethod.POST, "/api/users/**").hasRole("ADMIN")
+                        .requestMatchers(HttpMethod.POST, "/api/users/**").permitAll()
                         .requestMatchers(HttpMethod.PUT, "/api/users/**").hasRole("ADMIN")
                         .requestMatchers(HttpMethod.DELETE, "/api/users/**").hasRole("ADMIN")
 
